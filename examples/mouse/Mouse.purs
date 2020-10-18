@@ -5,11 +5,12 @@ import Data.Int (toNumber)
 import Data.Maybe (Maybe, maybe)
 import Data.Set (isEmpty)
 import Data.Typelevel.Num (D1)
+import Effect (Effect)
 import FRP.Behavior (Behavior)
-import FRP.Behavior.Audio (AudioUnit, gain', runInBrowser_, sinOsc, speaker')
+import Foreign.Object as O
+import FRP.Behavior.Audio (AudioContext, AudioUnit, gain', runInBrowser_, sinOsc, speaker',defaultExporter)
 import FRP.Behavior.Mouse (buttons, position)
 import FRP.Event.Mouse (Mouse, getMouse)
-import Type.Klank.Dev (Klank, klank)
 
 -- scene = const $ pure (speaker' $ (gain' 0.1 $ sinOsc 440.0))
 -- map (a -> b) (f a -> f b)
@@ -28,13 +29,28 @@ scene mouse = const $ f <$> click <*> poz
       )
   poz = position mouse
 
-main :: Klank
-main = klank
-  {
-  run = runInBrowser_
-    ( do
-        mouse <- getMouse
-        pure $ scene mouse
-    )
-   }
+main :: AudioContext -> Effect (Effect Unit)
+main ctx = do
+ runInBrowser_  
+       ( do
+            mouse <- getMouse
+            pure $ scene mouse
+        ) 
+    unit
+    ctx
+    { msBetweenSamples: 20
+    , msBetweenPings: 15
+    , fastforwardLowerBound: 0.025
+    , rewindUpperBound: 0.15
+    , initialOffset: 0.1
+    }
+    { periodicWaves: O.empty
+    , floatArrays: O.empty
+    , microphones: O.empty
+    , tracks: O.empty
+    , buffers: O.empty
+    }
+    { canvases: O.empty
+    }
+    defaultExporter
 

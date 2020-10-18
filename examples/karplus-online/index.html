@@ -13,17 +13,10 @@
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
           return audioCtx.audioWorklet.addModule("https://klank-share.s3.eu-west-1.amazonaws.com/K16029410960343210.js");
         }).then(function () {
-        offCb = PS["FRP.Behavior.Audio.Example.Karplus"].main.run()(
-          audioCtx
-        )({
-          msBetweenSamples: 20,
-          msBetweenPings: 15,
-          fastforwardLowerBound: 0.025,
-          rewindUpperBound: 0.15,
-          initialOffset: 0.1,
-      })({})({})(PS["FRP.Behavior.Audio.Example.Karplus"].main.exporter)();
+        offCb = PS["FRP.Behavior.Audio.Example.Karplus"].main(audioCtx)();
       });
     }
+    
     function turnOffAudio() {
       offCb ? offCb() : null;
       offCB = null;

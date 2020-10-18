@@ -8,9 +8,10 @@ import Data.Maybe (fromMaybe)
 import Data.NonEmpty ((:|))
 import Data.Tuple (Tuple(..), fst, snd)
 import Data.Typelevel.Num (D1)
+import Effect (Effect)
 import FRP.Behavior (Behavior)
-import FRP.Behavior.Audio (AudioParameter(..), AudioUnit,gain', gainT, runInBrowser, sinOsc, speaker')
-import Type.Klank.Dev (Klank, klank)
+import FRP.Behavior.Audio (AudioContext, AudioParameter(..), AudioUnit,gain', gainT, runInBrowser, sinOsc, speaker', defaultExporter)
+import Foreign.Object as O
 
 pwf0 :: Array (Tuple Number Number)
 pwf0 =
@@ -68,9 +69,23 @@ scene t =
             )
     )
 
-main :: Klank
-main =
-  klank
-    { run = runInBrowser scene
+main :: AudioContext -> Effect (Effect Unit)
+main ctx = do
+ runInBrowser scene unit
+    ctx
+    { msBetweenSamples: 20
+    , msBetweenPings: 15
+    , fastforwardLowerBound: 0.025
+    , rewindUpperBound: 0.15
+    , initialOffset: 0.1
     }
+    { periodicWaves: O.empty
+    , floatArrays: O.empty
+    , microphones: O.empty
+    , tracks: O.empty
+    , buffers: O.empty
+    }
+    { canvases: O.empty
+    }
+    defaultExporter
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
+<head>
+  <meta charset="UTF-8"> 
   </head>
 
   <script src="index.js"></script>
@@ -11,7 +11,7 @@
     function turnOnAudio() {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
-        offCb = PS["FRP.Behavior.Audio.Example.Periodic"].main(audioCtx)();
+        offCb = PS["FRP.Behavior.Audio.Example.Mp3Play"].main(audioCtx)();
       });
     }
     function turnOffAudio() {

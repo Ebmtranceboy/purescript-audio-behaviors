@@ -5,11 +5,11 @@ import Data.List ((:), List(..))
 import Data.NonEmpty ((:|))
 import Data.Typelevel.Num (D1)
 import Data.Vec ((+>), empty)
+import Effect (Effect)
 import FRP.Behavior (Behavior)
-import FRP.Behavior.Audio (AudioUnit, gain, gain', makePeriodicWave, periodicOsc, runInBrowser, speaker')
+import FRP.Behavior.Audio (AudioContext, AudioUnit, defaultExporter, gain, gain', makePeriodicWave, periodicOsc, runInBrowser, speaker')
 import Foreign.Object as O
 import Math (pi, sin)
-import Type.Klank.Dev (Klank, klank, PeriodicWaves)
 
 scene :: Number -> Behavior (AudioUnit D1)
 scene time =
@@ -26,16 +26,24 @@ scene time =
               )
           )
 
-periodicWaves :: PeriodicWaves
-periodicWaves ctx _ res rej = do
+main :: AudioContext -> Effect (Effect Unit)
+main ctx = do
   pw <- makePeriodicWave ctx (0.5 +> 0.25 +> 0.1 +> empty) (0.2 +> 0.1 +> 0.01 +> empty)
-  res $ O.singleton "smooth" pw
-
-main :: Klank
-main =
-  klank
-    { periodicWaves = periodicWaves
-    , run = runInBrowser scene
+  runInBrowser scene unit
+    ctx
+    { msBetweenSamples: 20
+    , msBetweenPings: 15
+    , fastforwardLowerBound: 0.025
+    , rewindUpperBound: 0.15
+    , initialOffset: 0.1
     }
-    
+    { periodicWaves: O.singleton "smooth" pw
+    , floatArrays: O.empty
+    , microphones: O.empty
+    , tracks: O.empty
+    , buffers: O.empty
+    }
+    { canvases: O.empty
+    }
+    defaultExporter
 
