@@ -2,12 +2,11 @@ module FRP.Behavior.Audio.Example.AudioWorklet where
 
 import Prelude
 import Data.Typelevel.Num (D1)
-import Effect (Effect)
 import FRP.Behavior (Behavior)
-import FRP.Behavior.Audio (AudioContext, AudioInfo, AudioUnit, EngineInfo, VisualInfo, Exporter, audioWorkletAggregator, audioWorkletGenerator, audioWorkletProcessor, defaultExporter, gain', runInBrowser, sinOsc, speaker')
-import Foreign.Object (Object)
+import FRP.Behavior.Audio (AudioUnit, audioWorkletAggregator, audioWorkletGenerator, audioWorkletProcessor, gain', runInBrowser, sinOsc, speaker')
 import Foreign.Object as O
 import Math (pi, sin)
+import Type.Klank.Dev (Klank,klank)
 
 scene :: Number -> Behavior (AudioUnit D1)
 scene time =
@@ -69,18 +68,8 @@ scene2p time =
   where
   rad = time * pi
 
-run ::
-  forall microphone track buffer floatArray periodicWave.
-  Unit ->
-  AudioContext ->
-  EngineInfo ->
-  AudioInfo (Object microphone) (Object track) (Object buffer) (Object floatArray) (Object periodicWave) ->
-  VisualInfo ->
-  Exporter Unit ->
-  Effect (Effect Unit)
-run = runInBrowser scene
+main :: Klank
+main = klank
+  { run = runInBrowser scene2p
+  }
 
-exporter = defaultExporter :: Exporter Unit
-
-main :: Effect Unit
-main = pure unit

@@ -1,2 +1,0 @@
-forest.mp3 filter=lfs diff=lfs merge=lfs -text
-moo.js filter=lfs diff=lfs merge=lfs -text

@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8"> 
+  </head>
+
   <script src="index.js"></script>
   <script>
     var offCb = null;
@@ -7,16 +11,13 @@
     function turnOnAudio() {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
-        var now = new Date().getTime();
-        var ctr = 0;
-        // null for the microphone
-        offCb = PS["FRP.Behavior.Audio.Example.Stress0"].run()(audioCtx)({
+        offCb = PS["FRP.Behavior.Audio.Example.AudioParameters"].main.run()(audioCtx)({
           msBetweenSamples: 20,
           msBetweenPings: 15,
           fastforwardLowerBound: 0.025,
           rewindUpperBound: 0.15,
           initialOffset: 0.1,
-        })({})({})(PS["FRP.Behavior.Audio.Example.Stress0"].exporter)();
+      })({})({})(PS["FRP.Behavior.Audio.Example.AudioParameters"].main.exporter)();
       });
     }
     function turnOffAudio() {
