@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title>Purescript Audio Behaviors</title>
+    <meta charset="UTF-8"> 
+    <title>PureScript Audio Behaviors</title>
   </head>
 
   <script src="index.js"></script>
@@ -12,11 +12,11 @@
     function turnOnAudio() {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
-        offCb = PS["FRP.Behavior.Audio.Example.AudioParameters"].main(audioCtx)();
+        offCb = PS["FRP.Behavior.Audio.Example.Piece"].main(audioCtx)();
       });
     }
     function turnOffAudio() {
-      offCb ? offCb() : null;
+      offCb ? offCb : null;
       offCB = null;
       audioCtx ? audioCtx.close() : null;
       audioCtx = null;

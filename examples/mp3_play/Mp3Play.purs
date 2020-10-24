@@ -33,7 +33,7 @@ scene =
 
 main :: AudioContext -> Effect (Effect Unit)
 main ctx = do
- forest <- makeAudioTrack "https://freesound.org/data/previews/530/530415_1648170-lq.mp3" 
+ forest <- makeAudioTrack "https://freesound.org/data/previews/530/530415_1648170-lq.mp3"  -- 71853_1062668-lq.mp3" -- "
  runInBrowser scene unit
     ctx
     { msBetweenSamples: 20
@@ -41,6 +41,7 @@ main ctx = do
     , fastforwardLowerBound: 0.025
     , rewindUpperBound: 0.15
     , initialOffset: 0.1
+    , doWebAudio: true
     }
     { periodicWaves: O.empty
     , floatArrays: O.empty

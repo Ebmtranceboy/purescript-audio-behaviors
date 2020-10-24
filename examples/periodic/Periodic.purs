@@ -36,6 +36,7 @@ main ctx = do
     , fastforwardLowerBound: 0.025
     , rewindUpperBound: 0.15
     , initialOffset: 0.1
+    , doWebAudio: true
     }
     { periodicWaves: O.singleton "smooth" pw
     , floatArrays: O.empty

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Player</title>
+    <meta charset="UTF-8">
+    <script>     
+
+      var current, playlist;
+      let prefix = "/home/joel/Documents/pub/purescript-audio-behaviors/examples/drum-seq/"
+      current = 0;
+      function loadplaylist() {
+        current++;
+        var songs = Array(prefix+"530415_1648170-lq.mp3");
+        playlist = songs.length;
+        if (current == playlist) {
+         //do nothing or stop
+        } 
+        else {
+         this.playOptions = document.getElementById("audio");
+         this.playOptions.src = songs[current];
+         this.playOptions.play();
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <audio id="audio" onended="loadplaylist()" src="/examples/drum-seq/530415_1648170-lq.mp3"  controls  ></audio>
+  </body>
+</html>

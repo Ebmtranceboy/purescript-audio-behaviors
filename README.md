@@ -570,6 +570,10 @@ From here, the only thing left is to make some noise! There are many more audio 
 
 To see a list of exported audio units, you can check out [`Audio.purs`](./src/FRP/Behavior/Audio.purs). In a future version of this, we will refactor things so that all of the audio units are in one package.
 
+## MIDI
+
+The file [src/FRP/Behavior/MIDI.purs](./src/FRP/Behavior/MIDI.purs) exposes one function - `midi` - that can be used in conjunction with `getMidi` [src/FRP/Event/MIDI.purs](./src/FRP/Event/MIDI.purs) to incorporate [realtime MIDI data](https://twitter.com/stronglynormal/status/1316756584786276352) into the audio graph. For an example of how this is done, check out [examples/midi-in](./examples/midi-in).
+
 ## Interacting with the browser
 
 In simple setups, you'll interact with the browser in a `<script>` tag to create resources like buffers and float arrays. This is how it is done in most of the [./examples](./examples) directory. However, sometimes you'll be creating a webpage using PureScript, in which case you may need to create a browser-specific resource like an audio buffer for a `playBuf` in PureScript.
@@ -648,35 +652,26 @@ If you are building an audio function that is supposed to be reused (ie your own
 myAwesomeFilter t = highpass_ ("myAwesomeFilter_" <> t) 1000.0 0.3 0.5
 ```
 
-### Tweaking parameters
+### Tweaking engine parameters
 
-Under the hood, `purescript-audio-behaviors` tries _really hard_ to guarantee that, no matter how laggy or janky the browser is, audio is rendered at a consistent rate so that there is no stutter. There are several parameters that influence this, and they all have tradeoffs.
-
-All of the parameters are passed to the function `runInBrowser` in the class `RunnableMedia`, which has the following signature:
+The `runInBrowser` function takes an `EngineInfo` parameter that specifies how the audio and animation should be rendered.
 
 ```haskell
-class RunnableMedia callback accumulator env where
-  runInBrowser ::
-    forall microphone track buffer floatArray periodicWave.
-    callback -> -- scene
-    accumulator -> -- initial accumulator
-    Int -> -- audio clock rate
-    Int -> -- driver rate
-    AudioContext -> -- audioContext
-    AudioInfo (Object microphone) (Object track) (Object buffer) (Object floatArray) (Object periodicWave) -> -- audio info
-    VisualInfo -> -- visual info
-    Exporter env -> -- exporter
-    Effect (Effect Unit)
+type EngineInfo
+  = { msBetweenSamples :: Int
+    , msBetweenPings :: Int
+    , fastforwardLowerBound :: Number
+    , rewindUpperBound :: Number
+    , initialOffset :: Number
+    }
 ```
 
-A lot of this is boilerplate, and you can see examples of how to hook this up in the [examples](./examples) directory. The two bits to understand here are:
-
-- audio clock rate
-- driver rate
-
-The _audio clock rate_ represents the number of milliseconds between control-rate pings to the scene. For example, if you set this to `20`, the scene will get polled every `0.02` seconds. When we use `20.0` as the `kr` in the examples above, we're referring to this rate. In general, for most applications, somewhere between `10` and `20` is the sweet spot. Too low and you'll skip frames (jank), too high and you'll start hearing the quantization.
-
-The _driver rate_ represents the number of milliseconds between pings to the entire reactive system. You can think of this as the motor behind the FRP. This should _always be_ less than the audio clock rate. The closer to the audio clock rate, the more likely there will be dropped frames because the system doesn't poll fast enough to make the audio deadline. The closer to `0`, the less responsive your UI will be. In general, `5ms` less than the _audio clock rate_ is a safe bet. So if your audio clock rate is `20`, this should be `15`.
+- `msBetweenSamples` - The number of milliseconds between samples of the audio behavior. This is the effective control rate. The lower the rate, the more rhythmic precision, and the higher the rate, the less likely there will be jank. Try `20`.
+- `msBetweenPings` - The number of milliseconds between pings to the sampling engine. The lower the rate, the less chance that you will miss a sampling deadline but the higher chance your page will lock up. This _must_ be less than `msBetweenSamples`. Try 15.
+- `fastforwardLowerBound` - The number of seconds below which the audio engine will skip a frame. The lower this is, the less likely there will be a skip, but the more likely the skip will sound jarring if it happens. Try `0.025`.
+- `rewindUpperBound` - The number of seconds of look-ahead. For uses that have no interactive component other than starting and stopping the sound (meaning no mouse, no MIDI Keyboard, etc) this can be large (ie `1.0` or even higher). For apps with an interactive component, you want this as low as possible, ie `0.06` or even lower. Note that this should be _at least_ twice `msBetweenSamples`.
+- `initialOffset` - The number of seconds to wait before playing. JavaScript does a lot of memory allocation when a klank starts playing, which sometimes results in jank. Try something between `0.1` and `0.4`.
+- `doWebAudio` - Should we render all of this stuff towith the web audio API? If true, then yes, otherwise the Web Audio API won't be called. Useful when you want to use an exporter without making sound in the browser.
 
 ## Bundling on your site
 

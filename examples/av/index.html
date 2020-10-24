@@ -6,13 +6,19 @@
   </head>
 
   <script src="index.js"></script>
+  
+  <canvas id="myCanvas"></canvas>
+  
   <script>
+  
+    myCanvas = document.querySelector("#myCanvas");
+  
     var offCb = null;
     var audioCtx = null;
     function turnOnAudio() {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
-        offCb = PS["FRP.Behavior.Audio.Example.AudioParameters"].main(audioCtx)();
+        offCb = PS["FRP.Behavior.Audio.Example.AV"].main(audioCtx)(function (){return myCanvas;})();
       });
     }
     function turnOffAudio() {

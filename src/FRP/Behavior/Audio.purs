@@ -15,7 +15,9 @@ module FRP.Behavior.Audio
   , audioWorkletAggregator
   , play
   , playBuf
+  , playBufWithOffset
   , loopBuf
+  , iirFilter
   , lowpass
   , highpass
   , bandpass
@@ -44,6 +46,9 @@ module FRP.Behavior.Audio
   , split4
   , split5
   , panner
+  , pannerMono
+  , spatialPanner
+  , spatialPannerMono
   , mul
   , add
   , merger
@@ -57,7 +62,9 @@ module FRP.Behavior.Audio
   , audioWorkletAggregator_
   , play_
   , playBuf_
+  , playBufWithOffset_
   , loopBuf_
+  , iirFilter_
   , lowpass_
   , highpass_
   , bandpass_
@@ -85,6 +92,9 @@ module FRP.Behavior.Audio
   , split4_
   , split5_
   , panner_
+  , pannerMono_
+  , spatialPanner_
+  , spatialPannerMono_
   , mul_
   , add_
   , merger_
@@ -95,6 +105,7 @@ module FRP.Behavior.Audio
   , audioWorkletProcessorT
   , audioWorkletAggregatorT
   , playBufT
+  , playBufWithOffsetT
   , loopBufT
   , lowpassT
   , highpassT
@@ -111,6 +122,9 @@ module FRP.Behavior.Audio
   , triangleOscT
   , squareOscT
   , pannerT
+  , pannerMonoT
+  , spatialPannerT
+  , spatialPannerMonoT
   , constantT
   , delayT
   , gainT
@@ -118,6 +132,7 @@ module FRP.Behavior.Audio
   , audioWorkletProcessorT_
   , audioWorkletAggregatorT_
   , playBufT_
+  , playBufWithOffsetT_
   , loopBufT_
   , lowpassT_
   , highpassT_
@@ -134,6 +149,9 @@ module FRP.Behavior.Audio
   , triangleOscT_
   , squareOscT_
   , pannerT_
+  , pannerMonoT_
+  , spatialPannerT_
+  , spatialPannerMonoT_
   , constantT_
   , delayT_
   , gainT_
@@ -182,6 +200,7 @@ module FRP.Behavior.Audio
   , aggregators
   , reflectSymbols
   , g'dynamicsCompressorT_
+  , g'iirFilter_
   , g'lowpass_
   , g'lowpassT_
   , g'peakingT_
@@ -192,8 +211,10 @@ module FRP.Behavior.Audio
   , g'lowshelf
   , g'notchT_
   , g'panner
+  , g'spatialPanner
   , g'gain
   , g'panner_
+  , g'spatialPanner_
   , g'bandpassT
   , g'delay_
   , g'bandpass_
@@ -208,8 +229,10 @@ module FRP.Behavior.Audio
   , g'audioWorkletProcessorT_
   , g'peaking
   , g'pannerT_
+  , g'spatialPannerT_
   , g'audioWorkletProcessor_
   , g'delayT_
+  , g'iirFilter
   , g'lowpass
   , g'bandpass
   , g'notch_
@@ -225,6 +248,7 @@ module FRP.Behavior.Audio
   , g'audioWorkletProcessor
   , g'mul
   , g'pannerT
+  , g'spatialPannerT
   , g'lowshelf_
   , g'bandpassT_
   , g'lowshelfT_
@@ -246,8 +270,12 @@ module FRP.Behavior.Audio
   , g'waveShaper_
   , g'highshelf_
   , defaultExporter
-  , AudioUnit'(..)
   , audioGrouper
+  , pannerVars
+  , pannerVars'
+  , PannerVars
+  , PannerVars'
+  , AudioUnit'(..)
   , SampleFrame
   , AudioProcessor
   , AudioParameter(..)
@@ -279,6 +307,8 @@ module FRP.Behavior.Audio
   , Animation(..)
   , IAudioUnit(..)
   , IAnimation(..)
+  , DistanceModel(..)
+  , PanningModel(..)
   , AudioGraph
   , AudioGraphProcessor
   , AudioGraphAggregator
@@ -338,7 +368,7 @@ import Data.String (Pattern(..), split, take)
 import Data.Symbol (class IsSymbol, SProxy(..), reflectSymbol)
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..), fst, snd, swap, uncurry)
-import Data.Typelevel.Num (class Pos, D1, D2, D3, D4, D5, toInt')
+import Data.Typelevel.Num (class LtEq, class Pos, D1, D2, D3, D4, D5, D20, toInt')
 import Data.Unfoldable (class Unfoldable)
 import Data.Unfoldable1 as DU
 import Data.Vec (Vec, fill)
@@ -357,7 +387,6 @@ import Foreign.Object as O
 import Graphics.Canvas (CanvasElement, Rectangle, clearRect, getCanvasHeight, getCanvasWidth, getContext2D)
 import Graphics.Drawing (Drawing, render)
 import Heterogeneous.Mapping (class HMap, class Mapping, hmap)
-import Math as Math
 import Prim.Boolean (False, True, kind Boolean)
 import Prim.Row (class Union)
 import Prim.RowList (class RowToList, Cons, Nil, kind RowList)
@@ -371,6 +400,7 @@ import Type.Data.Graph (class FlipDirection, class HasDuplicateEdges, class HasD
 import Type.Proxy (Proxy(..))
 import Type.Row.Homogeneous (class Homogeneous)
 import Type.RowList (class ListToRow, RLProxy(..))
+import Unsafe.Coerce (unsafeCoerce)
 
 foreign import data BrowserPeriodicWave :: Type
 
@@ -790,6 +820,41 @@ instance showAudioBuffer :: Show AudioBuffer where
 
 derive instance eqAudioBuffer :: Eq AudioBuffer
 
+data DistanceModel
+  = Linear
+  | Inverse
+  | Exponential
+
+dm2str :: DistanceModel -> String
+dm2str Linear = "linear"
+
+dm2str Inverse = "inverse"
+
+dm2str Exponential = "exponential"
+
+derive instance genericDistanceModel :: Generic DistanceModel _
+
+instance showDistanceModel :: Show DistanceModel where
+  show s = genericShow s
+
+derive instance eqDistanceModel :: Eq DistanceModel
+
+data PanningModel
+  = EqualPower
+  | HRTF
+
+pm2str :: PanningModel -> String
+pm2str EqualPower = "equalpower"
+
+pm2str HRTF = "HRTF"
+
+derive instance genericPanningModel :: Generic PanningModel _
+
+instance showPanningModel :: Show PanningModel where
+  show s = genericShow s
+
+derive instance eqPanningModel :: Eq PanningModel
+
 data Oversample
   = None
   | TwoX
@@ -811,8 +876,64 @@ newtype AudioParameter a
 instance audioParameterFunctor :: Functor AudioParameter where
   map f (AudioParameter { param, timeOffset }) = AudioParameter { param: f param, timeOffset }
 
+type PannerVars
+  = { coneInnerAngle :: (AudioParameter Number)
+    , coneOuterAngle :: (AudioParameter Number)
+    , coneOuterGain :: (AudioParameter Number)
+    , distanceModel :: DistanceModel
+    , maxDistance :: (AudioParameter Number)
+    , orientationX :: (AudioParameter Number)
+    , orientationY :: (AudioParameter Number)
+    , orientationZ :: (AudioParameter Number)
+    , panningModel :: PanningModel
+    , positionX :: (AudioParameter Number)
+    , positionY :: (AudioParameter Number)
+    , positionZ :: (AudioParameter Number)
+    , refDistance :: (AudioParameter Number)
+    , rolloffFactor :: (AudioParameter Number)
+    }
+
+type PannerVars'
+  = { coneInnerAngle :: Number
+    , coneOuterAngle :: Number
+    , coneOuterGain :: Number
+    , distanceModel :: DistanceModel
+    , maxDistance :: Number
+    , orientationX :: Number
+    , orientationY :: Number
+    , orientationZ :: Number
+    , panningModel :: PanningModel
+    , positionX :: Number
+    , positionY :: Number
+    , positionZ :: Number
+    , refDistance :: Number
+    , rolloffFactor :: Number
+    }
+
+pannerVars' :: PannerVars'
+pannerVars' =
+  { coneInnerAngle: 360.0
+  , coneOuterAngle: 360.0
+  , coneOuterGain: 0.0
+  , distanceModel: Inverse
+  , maxDistance: 10000.0
+  , orientationX: 1.0
+  , orientationY: 0.0
+  , orientationZ: 0.0
+  , panningModel: EqualPower
+  , positionX: 0.0
+  , positionY: 0.0
+  , positionZ: 0.0
+  , refDistance: 1.0
+  , rolloffFactor: 1.0
+  }
+
+pannerVars :: PannerVars
+pannerVars = pannerVarsAsAudioParams pannerVars'
+
 data AudioGraphProcessor
   = GAudioWorkletProcessor MString String (Object (AudioParameter Number))
+  | GIIRFilter MString (Array Number) (Array Number)
   | GLowpass MString (AudioParameter Number) (AudioParameter Number)
   | GHighpass MString (AudioParameter Number) (AudioParameter Number)
   | GBandpass MString (AudioParameter Number) (AudioParameter Number)
@@ -825,6 +946,7 @@ data AudioGraphProcessor
   | GDynamicsCompressor MString (AudioParameter Number) (AudioParameter Number) (AudioParameter Number) (AudioParameter Number) (AudioParameter Number)
   | GWaveShaper MString String Oversample
   | GStereoPanner MString (AudioParameter Number)
+  | GPanner MString PannerVars
   | GDelay MString (AudioParameter Number)
 
 data AudioGraphAggregator
@@ -845,8 +967,9 @@ data AudioUnit ch
   | AudioWorkletProcessor MString String (Object (AudioParameter Number)) (AudioUnit ch)
   | AudioWorkletAggregator MString String (Object (AudioParameter Number)) (NonEmpty List (AudioUnit ch))
   | Play MString String Number
-  | PlayBuf MString String (AudioParameter Number)
+  | PlayBuf MString String (AudioParameter Number) (AudioParameter Number)
   | LoopBuf MString String (AudioParameter Number) Number Number
+  | IIRFilter MString (Array Number) (Array Number) (AudioUnit ch)
   | Lowpass MString (AudioParameter Number) (AudioParameter Number) (AudioUnit ch)
   | Highpass MString (AudioParameter Number) (AudioParameter Number) (AudioUnit ch)
   | Bandpass MString (AudioParameter Number) (AudioParameter Number) (AudioUnit ch)
@@ -873,6 +996,7 @@ data AudioUnit ch
   | Split3 MString (AudioUnit D3) (Vec D3 (AudioUnit D1) -> AudioUnit ch)
   | Split4 MString (AudioUnit D4) (Vec D4 (AudioUnit D1) -> AudioUnit ch)
   | Split5 MString (AudioUnit D5) (Vec D5 (AudioUnit D1) -> AudioUnit ch)
+  | Panner MString PannerVars (AudioUnit ch)
   | StereoPanner MString (AudioParameter Number) (AudioUnit ch)
   | Mul MString (NonEmpty List (AudioUnit ch))
   | Add MString (NonEmpty List (AudioUnit ch))
@@ -892,8 +1016,9 @@ data AudioUnit'
   | AudioWorkletProcessor' String (Object (AudioParameter Number))
   | AudioWorkletAggregator' String (Object (AudioParameter Number))
   | Play' String Number
-  | PlayBuf' String (AudioParameter Number)
+  | PlayBuf' String (AudioParameter Number) (AudioParameter Number)
   | LoopBuf' String (AudioParameter Number) Number Number
+  | IIRFilter' (Array Number) (Array Number)
   | Lowpass' (AudioParameter Number) (AudioParameter Number)
   | Highpass' (AudioParameter Number) (AudioParameter Number)
   | Bandpass' (AudioParameter Number) (AudioParameter Number)
@@ -913,6 +1038,22 @@ data AudioUnit'
   | SquareOsc' (AudioParameter Number)
   | Splitter' Int
   | StereoPanner' (AudioParameter Number)
+  | Panner'
+    { coneInnerAngle :: (AudioParameter Number)
+    , coneOuterAngle :: (AudioParameter Number)
+    , coneOuterGain :: (AudioParameter Number)
+    , distanceModel :: DistanceModel
+    , maxDistance :: (AudioParameter Number)
+    , orientationX :: (AudioParameter Number)
+    , orientationY :: (AudioParameter Number)
+    , orientationZ :: (AudioParameter Number)
+    , panningModel :: PanningModel
+    , positionX :: (AudioParameter Number)
+    , positionY :: (AudioParameter Number)
+    , positionZ :: (AudioParameter Number)
+    , refDistance :: (AudioParameter Number)
+    , rolloffFactor :: (AudioParameter Number)
+    }
   | Mul'
   | Add'
   | Swap'
@@ -966,6 +1107,11 @@ isLoopBuf_ :: AudioUnit'' -> Boolean
 isLoopBuf_ LoopBuf'' = true
 
 isLoopBuf_ _ = false
+
+isIIRFilter_ :: AudioUnit'' -> Boolean
+isIIRFilter_ IIRFilter'' = true
+
+isIIRFilter_ _ = false
 
 isLowpass_ :: AudioUnit'' -> Boolean
 isLowpass_ Lowpass'' = true
@@ -1062,6 +1208,11 @@ isStereoPanner_ StereoPanner'' = true
 
 isStereoPanner_ _ = false
 
+isPanner_ :: AudioUnit'' -> Boolean
+isPanner_ Panner'' = true
+
+isPanner_ _ = false
+
 isMul_ :: AudioUnit'' -> Boolean
 isMul_ Mul'' = true
 
@@ -1125,6 +1276,7 @@ data AudioUnit''
   | Play''
   | PlayBuf''
   | LoopBuf''
+  | IIRFilter''
   | Lowpass''
   | Highpass''
   | Bandpass''
@@ -1144,6 +1296,7 @@ data AudioUnit''
   | SquareOsc''
   | Splitter''
   | StereoPanner''
+  | Panner''
   | Mul''
   | Add''
   | Swap''
@@ -1180,6 +1333,8 @@ agp2au' (GAudioWorkletProcessor name unit params) = { au: AudioWorkletProcessor'
 
 agp2au' (GLowpass name f q) = { au: Lowpass' f q, name }
 
+agp2au' (GIIRFilter name ff fb) = { au: IIRFilter' ff fb, name }
+
 agp2au' (GHighpass name f q) = { au: Highpass' f q, name }
 
 agp2au' (GBandpass name f q) = { au: Bandpass' f q, name }
@@ -1207,6 +1362,8 @@ agp2au' (GWaveShaper name curve os) = { au: (WaveShaper' curve os), name }
 
 agp2au' (GStereoPanner name n) = { au: (StereoPanner' n), name }
 
+agp2au' (GPanner name vars) = { au: (Panner' vars), name }
+
 au' :: forall ch. Pos ch => AudioUnit ch -> { au :: AudioUnit', name :: MString }
 au' (Microphone name) = { au: Microphone', name }
 
@@ -1218,9 +1375,11 @@ au' (AudioWorkletAggregator name unit params _) = { au: AudioWorkletAggregator' 
 
 au' (Play name file timingHack) = { au: Play' file timingHack, name }
 
-au' (PlayBuf name buf speed) = { au: PlayBuf' buf speed, name }
+au' (PlayBuf name buf speed offsetInBuffer) = { au: PlayBuf' buf speed offsetInBuffer, name }
 
 au' (LoopBuf name buf speed start end) = { au: LoopBuf' buf speed start end, name }
+
+au' (IIRFilter name ff fb _) = { au: IIRFilter' ff fb, name }
 
 au' (Lowpass name f q _) = { au: Lowpass' f q, name }
 
@@ -1279,6 +1438,8 @@ au' (Split5 name _ _) = { au: (Splitter' 5), name }
 
 au' (StereoPanner name n _) = { au: (StereoPanner' n), name }
 
+au' (Panner name vars _) = { au: (Panner' vars), name }
+
 au' (Mul name _) = { au: Mul', name }
 
 au' (Add name _) = { au: Add', name }
@@ -1318,9 +1479,11 @@ au'' (AudioWorkletAggregator' _ _) = AudioWorkletAggregator''
 
 au'' (Play' _ _) = Play''
 
-au'' (PlayBuf' _ _) = PlayBuf''
+au'' (PlayBuf' _ _ _) = PlayBuf''
 
 au'' (LoopBuf' _ _ _ _) = LoopBuf''
+
+au'' (IIRFilter' _ _) = IIRFilter''
 
 au'' (Lowpass' _ _) = Lowpass''
 
@@ -1360,6 +1523,8 @@ au'' (Splitter' _) = Splitter''
 
 au'' (StereoPanner' _) = StereoPanner''
 
+au'' (Panner' _) = Panner''
+
 au'' Mul' = Mul''
 
 au'' Add' = Add''
@@ -1393,9 +1558,11 @@ tagToAU AudioWorkletProcessor'' = AudioWorkletProcessor' "" O.empty
 
 tagToAU AudioWorkletAggregator'' = AudioWorkletAggregator' "" O.empty
 
-tagToAU PlayBuf'' = PlayBuf' "" (ap_ (-1.0))
+tagToAU PlayBuf'' = PlayBuf' "" (ap_ (-1.0)) (ap_ (-1.0))
 
 tagToAU LoopBuf'' = LoopBuf' "" (ap_ (-1.0)) (-1.0) (-1.0)
+
+tagToAU IIRFilter'' = IIRFilter' [] []
 
 tagToAU Lowpass'' = Lowpass' (ap_ (-1.0)) (ap_ (-1.0))
 
@@ -1432,6 +1599,24 @@ tagToAU SinOsc'' = SinOsc' (ap_ 50000.0)
 tagToAU SquareOsc'' = SquareOsc' (ap_ 50000.0)
 
 tagToAU Splitter'' = Splitter' (-1)
+
+tagToAU Panner'' =
+  Panner'
+    { coneInnerAngle: (ap_ (-3.0))
+    , coneOuterAngle: (ap_ (-3.0))
+    , coneOuterGain: (ap_ (-3.0))
+    , distanceModel: Inverse
+    , maxDistance: (ap_ (-3.0))
+    , orientationX: (ap_ (-3.0))
+    , orientationY: (ap_ (-3.0))
+    , orientationZ: (ap_ (-3.0))
+    , panningModel: EqualPower
+    , positionX: (ap_ (-3.0))
+    , positionY: (ap_ (-3.0))
+    , positionZ: (ap_ (-3.0))
+    , refDistance: (ap_ (-3.0))
+    , rolloffFactor: (ap_ (-3.0))
+    }
 
 tagToAU StereoPanner'' = (StereoPanner' (ap_ 3.0))
 
@@ -1847,9 +2032,11 @@ type PtrInfo
 
   go' ptr v@(Play _ _ _) = terminus ptr v
 
-  go' ptr v@(PlayBuf _ _ _) = terminus ptr v
+  go' ptr v@(PlayBuf _ _ _ _) = terminus ptr v
 
   go' ptr v@(LoopBuf _ _ _ _ _) = terminus ptr v
+
+  go' ptr v@(IIRFilter _ _ _ a) = passthrough ptr v a
 
   go' ptr v@(Lowpass _ _ _ a) = passthrough ptr v a
 
@@ -1902,6 +2089,8 @@ type PtrInfo
   go' ptr v@(DupRes) = terminus ptr v
 
   go' ptr v@(StereoPanner name n a) = passthrough ptr v a
+
+  go' ptr v@(Panner name vars a) = passthrough ptr v a
 
   go' ptr v@(Delay name n a) = passthrough ptr v a
 
@@ -2144,7 +2333,7 @@ playBuf ::
   String ->
   Number ->
   AudioUnit ch
-playBuf handle n = PlayBuf Nothing handle (ap_ n)
+playBuf handle n = PlayBuf Nothing handle (ap_ n) (ap_ 0.0)
 
 playBuf_ ::
   forall ch.
@@ -2153,7 +2342,7 @@ playBuf_ ::
   String ->
   Number ->
   AudioUnit ch
-playBuf_ s handle n = PlayBuf (Just s) handle (ap_ n)
+playBuf_ s handle n = PlayBuf (Just s) handle (ap_ n) (ap_ 0.0)
 
 playBufT ::
   forall ch.
@@ -2161,7 +2350,7 @@ playBufT ::
   String ->
   AudioParameter Number ->
   AudioUnit ch
-playBufT handle n = PlayBuf Nothing handle n
+playBufT handle n = PlayBuf Nothing handle n (ap_ 0.0)
 
 playBufT_ ::
   forall ch.
@@ -2170,7 +2359,45 @@ playBufT_ ::
   String ->
   AudioParameter Number ->
   AudioUnit ch
-playBufT_ s handle n = PlayBuf (Just s) handle n
+playBufT_ s handle n = PlayBuf (Just s) handle n (ap_ 0.0)
+
+playBufWithOffset ::
+  forall ch.
+  Pos ch =>
+  String ->
+  Number ->
+  Number ->
+  AudioUnit ch
+playBufWithOffset handle n o = PlayBuf Nothing handle (ap_ n) (ap_ o)
+
+playBufWithOffset_ ::
+  forall ch.
+  Pos ch =>
+  String ->
+  String ->
+  Number ->
+  Number ->
+  AudioUnit ch
+playBufWithOffset_ s handle n o = PlayBuf (Just s) handle (ap_ n) (ap_ o)
+
+playBufWithOffsetT ::
+  forall ch.
+  Pos ch =>
+  String ->
+  AudioParameter Number ->
+  AudioParameter Number ->
+  AudioUnit ch
+playBufWithOffsetT handle n o = PlayBuf Nothing handle n o
+
+playBufWithOffsetT_ ::
+  forall ch.
+  Pos ch =>
+  String ->
+  String ->
+  AudioParameter Number ->
+  AudioParameter Number ->
+  AudioUnit ch
+playBufWithOffsetT_ s handle n o = PlayBuf (Just s) handle n o
 
 -- | Loop a sound from a buffer
 -- |
@@ -2220,7 +2447,33 @@ loopBufT_ ::
   AudioUnit ch
 loopBufT_ s handle a b c = LoopBuf (Just s) handle a b c
 
--- | A lowpass filter.
+-- | An IIR filter. See the [web audio API docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_IIR_filters) for more information.
+-- |
+-- | - ff: Feedforward coefficients.
+-- | - fb: Feedback coefficients
+iirFilter ::
+  forall ch len.
+  Pos ch =>
+  Pos len =>
+  LtEq len D20 =>
+  Vec len Number ->
+  Vec len Number ->
+  AudioUnit ch ->
+  AudioUnit ch
+iirFilter a b = IIRFilter Nothing (V.toArray a) (V.toArray b)
+
+iirFilter_ ::
+  forall ch len.
+  Pos ch =>
+  Pos len =>
+  LtEq len D20 =>
+  String ->
+  Vec len Number ->
+  Vec len Number ->
+  AudioUnit ch ->
+  AudioUnit ch
+iirFilter_ s a b = IIRFilter (Just s) (V.toArray a) (V.toArray b)
+
 -- |
 -- | - f:  The cutoff frequency.
 -- | - q:  The Q value in positive decibels. See [BiquadFilterNode](https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode) in the WebAudio documentation for more information on Q values.
@@ -2648,6 +2901,63 @@ pannerT n = StereoPanner Nothing n
 
 pannerT_ :: String -> AudioParameter Number -> AudioUnit D2 -> AudioUnit D2
 pannerT_ s n = StereoPanner (Just s) n
+
+pannerMono :: Number -> AudioUnit D1 -> AudioUnit D2
+pannerMono n = panner n <<< unsafeCoerce
+
+pannerMono_ :: String -> Number -> AudioUnit D1 -> AudioUnit D2
+pannerMono_ s n = panner_ s n <<< unsafeCoerce
+
+pannerMonoT :: AudioParameter Number -> AudioUnit D1 -> AudioUnit D2
+pannerMonoT n = pannerT n <<< unsafeCoerce
+
+pannerMonoT_ :: String -> AudioParameter Number -> AudioUnit D1 -> AudioUnit D2
+pannerMonoT_ s n = pannerT_ s n <<< unsafeCoerce
+
+-- | A spatial panner.
+-- |
+-- | See [Panner](https://developer.mozilla.org/en-US/docs/Web/API/PannerNode) in the WebAudio API.
+pannerVarsAsAudioParams :: PannerVars' -> PannerVars
+pannerVarsAsAudioParams n =
+  { coneInnerAngle: (ap_ n.coneInnerAngle)
+  , coneOuterAngle: (ap_ n.coneOuterAngle)
+  , coneOuterGain: (ap_ n.coneOuterGain)
+  , distanceModel: n.distanceModel
+  , maxDistance: (ap_ n.maxDistance)
+  , orientationX: (ap_ n.orientationX)
+  , orientationY: (ap_ n.orientationY)
+  , orientationZ: (ap_ n.orientationZ)
+  , panningModel: n.panningModel
+  , positionX: (ap_ n.positionX)
+  , positionY: (ap_ n.positionY)
+  , positionZ: (ap_ n.positionZ)
+  , refDistance: (ap_ n.refDistance)
+  , rolloffFactor: (ap_ n.rolloffFactor)
+  }
+
+spatialPanner :: PannerVars' -> AudioUnit D2 -> AudioUnit D2
+spatialPanner = Panner Nothing <<< pannerVarsAsAudioParams
+
+spatialPanner_ :: String -> PannerVars' -> AudioUnit D2 -> AudioUnit D2
+spatialPanner_ s = Panner (Just s) <<< pannerVarsAsAudioParams
+
+spatialPannerT :: PannerVars -> AudioUnit D2 -> AudioUnit D2
+spatialPannerT = Panner Nothing
+
+spatialPannerT_ :: String -> PannerVars -> AudioUnit D2 -> AudioUnit D2
+spatialPannerT_ s = Panner (Just s)
+
+spatialPannerMono :: PannerVars' -> AudioUnit D1 -> AudioUnit D2
+spatialPannerMono v = spatialPanner v <<< unsafeCoerce
+
+spatialPannerMono_ :: String -> PannerVars' -> AudioUnit D1 -> AudioUnit D2
+spatialPannerMono_ s v = spatialPanner_ s v <<< unsafeCoerce
+
+spatialPannerMonoT :: PannerVars -> AudioUnit D1 -> AudioUnit D2
+spatialPannerMonoT v = spatialPannerT v <<< unsafeCoerce
+
+spatialPannerMonoT_ :: String -> PannerVars -> AudioUnit D1 -> AudioUnit D2
+spatialPannerMonoT_ s v = spatialPannerT_ s v <<< unsafeCoerce
 
 -- | Send sound to the speaker.
 -- |
@@ -3121,6 +3431,25 @@ g'audioWorkletProcessorT_ ::
   AudioGraphProcessor
 g'audioWorkletProcessorT_ s handle n = GAudioWorkletProcessor (Just s) handle n
 
+g'iirFilter ::
+  forall len.
+  Pos len =>
+  LtEq len D20 =>
+  Vec len Number ->
+  Vec len Number ->
+  AudioGraphProcessor
+g'iirFilter a b = GIIRFilter Nothing (V.toArray a) (V.toArray b)
+
+g'iirFilter_ ::
+  forall len.
+  Pos len =>
+  LtEq len D20 =>
+  String ->
+  Vec len Number ->
+  Vec len Number ->
+  AudioGraphProcessor
+g'iirFilter_ s a b = GIIRFilter (Just s) (V.toArray a) (V.toArray b)
+
 g'lowpass :: Number -> Number -> AudioGraphProcessor
 g'lowpass a b = GLowpass Nothing (ap_ a) (ap_ b)
 
@@ -3286,6 +3615,18 @@ g'pannerT n = GStereoPanner Nothing n
 g'pannerT_ :: String -> AudioParameter Number -> AudioGraphProcessor
 g'pannerT_ s n = GStereoPanner (Just s) n
 
+g'spatialPanner :: PannerVars' -> AudioGraphProcessor
+g'spatialPanner = GPanner Nothing <<< pannerVarsAsAudioParams
+
+g'spatialPanner_ :: String -> PannerVars' -> AudioGraphProcessor
+g'spatialPanner_ s = GPanner (Just s) <<< pannerVarsAsAudioParams
+
+g'spatialPannerT :: PannerVars -> AudioGraphProcessor
+g'spatialPannerT = GPanner Nothing
+
+g'spatialPannerT_ :: String -> PannerVars -> AudioGraphProcessor
+g'spatialPannerT_ s = GPanner (Just s)
+
 g'mul :: AudioGraphAggregator
 g'mul = GMul Nothing
 
@@ -3351,11 +3692,13 @@ ucomp (AudioWorkletAggregator' n0 _) (AudioWorkletAggregator' n1 _) = n0 == n1
 
 ucomp (Play' s0 _) (Play' s1 _) = s0 == s1
 
-ucomp (PlayBuf' s0 _) (PlayBuf' s1 _) = s0 == s1
+ucomp (PlayBuf' s0 _ _) (PlayBuf' s1 _ _) = s0 == s1
 
 ucomp (LoopBuf' s0 _ _ _) (LoopBuf' s1 _ _ _) = s0 == s1
 
 ucomp (Lowpass' _ _) (Lowpass' _ _) = true
+
+ucomp (IIRFilter' a b) (IIRFilter' x y) = a == x && b == y
 
 ucomp (Highpass' _ _) (Highpass' _ _) = true
 
@@ -3392,6 +3735,8 @@ ucomp (SquareOsc' _) (SquareOsc' _) = true
 ucomp (Splitter' _) (Splitter' _) = true
 
 ucomp (StereoPanner' _) (StereoPanner' _) = true
+
+ucomp (Panner' x) (Panner' y) = x.distanceModel == y.distanceModel && x.panningModel == y.panningModel
 
 ucomp Mul' Mul' = true
 
@@ -3430,93 +3775,6 @@ delayMULT = 0.1 :: Number
 panMULT = 0.5 :: Number
 
 srMULT = 100.0 :: Number -- should never happen
-
-filtCoef :: AudioParameter Number -> AudioParameter Number -> AudioParameter Number -> AudioParameter Number -> AudioParameter Number -> AudioParameter Number -> Number
-filtCoef (AudioParameter { param: a }) (AudioParameter { param: b }) (AudioParameter { param: c }) (AudioParameter { param: x }) (AudioParameter { param: y }) (AudioParameter { param: z }) = (Math.abs $ a - x) * oscMULT + (Math.abs $ b - y) * qMULT + (Math.abs $ c - z) * gainMULT
-
-twoCoef :: AudioParameter Number -> AudioParameter Number -> Number
-twoCoef (AudioParameter { param: f0 }) (AudioParameter { param: f1 }) = (Math.abs $ f0 - f1)
-
-toCoef :: AudioUnit' -> AudioUnit' -> Number
-toCoef Microphone' Microphone' = 0.0
-
-toCoef (Lowpass' a b) (Lowpass' x y) = filtCoef a b (ap_ 0.0) x y (ap_ 0.0)
-
-toCoef (Highpass' a b) (Highpass' x y) = filtCoef a b (ap_ 0.0) x y (ap_ 0.0)
-
-toCoef (Bandpass' a b) (Bandpass' x y) = filtCoef a b (ap_ 0.0) x y (ap_ 0.0)
-
-toCoef (Lowshelf' a c) (Lowshelf' x z) = filtCoef a (ap_ 0.0) c x (ap_ 0.0) z
-
-toCoef (Highshelf' a c) (Highshelf' x z) = filtCoef a (ap_ 0.0) c x (ap_ 0.0) z
-
-toCoef (Peaking' a b c) (Peaking' x y z) = filtCoef a b c x y z
-
-toCoef (Notch' a b) (Notch' x y) = filtCoef a b (ap_ 0.0) x y (ap_ 0.0)
-
-toCoef (Allpass' a b) (Allpass' x y) = filtCoef a b (ap_ 0.0) x y (ap_ 0.0)
-
--- we use types in the function-level constructor to gate closeness
--- we still assess an absurd penalty just as a precaution
--- in case the sizes don't match
-toCoef (Convolver' a) (Convolver' b) =
-  if a /= b then
-    10000.0
-  else
-    0.0
-
-toCoef (DynamicsCompressor' (AudioParameter { param: a }) (AudioParameter { param: b }) (AudioParameter { param: c }) (AudioParameter { param: d }) (AudioParameter { param: e })) (DynamicsCompressor' (AudioParameter { param: v }) (AudioParameter { param: w }) (AudioParameter { param: x }) (AudioParameter { param: y }) (AudioParameter { param: z })) =
-  foldl (+)
-    0.0
-    (zipWith (\i j -> Math.abs $ i - j) [ a, b, c, d, e ] [ v, w, x, y, z ])
-
-toCoef (SawtoothOsc' f0) (SawtoothOsc' f1) = oscMULT * twoCoef f0 f1
-
-toCoef (TriangleOsc' f0) (TriangleOsc' f1) = oscMULT * twoCoef f0 f1
-
--- todo : make periodic osc wavetable weighted?
-toCoef (PeriodicOsc' f0 _) (PeriodicOsc' f1 _) = oscMULT * twoCoef f0 f1
-
-toCoef (WaveShaper' l0 e0) (WaveShaper' l1 e1) =
-  ( if e0 /= e1 then
-      5.0
-    else
-      0.0
-  )
-
-toCoef (Dup') (Dup') = 0.0
-
-toCoef (SinOsc' f0) (SinOsc' f1) = oscMULT * twoCoef f0 f1
-
-toCoef (SquareOsc' f0) (SquareOsc' f1) = oscMULT * twoCoef f0 f1
-
-toCoef (Splitter' _) (Splitter' _) = 0.0
-
-toCoef (StereoPanner' p0) (StereoPanner' p1) = panMULT * twoCoef p0 p1
-
-toCoef Mul' Mul' = 0.0
-
-toCoef Add' Add' = 0.0
-
-toCoef Swap' Swap' = 0.0
-
-toCoef (Merger' _) (Merger' _) = 0.0
-
-toCoef (Constant' c0) (Constant' c1) = constMULT * twoCoef c0 c1
-
-toCoef (Delay' d0) (Delay' d1) = delayMULT * twoCoef d0 d1
-
-toCoef (Gain' g0) (Gain' g1) = gainMULT * twoCoef g0 g1
-
-toCoef Speaker' Speaker' = 0.0
-
-toCoef NoSound' NoSound' = 0.0
-
-toCoef (SplitRes' i0) (SplitRes' i1) = (Math.abs $ toNumber (i0 - i1)) * srMULT
-
-toCoef DupRes' DupRes' = 0.0
-
-toCoef _ _ = 0.0
 
 acomp :: PtrInfo -> PtrInfo -> Boolean
 acomp a b = ucomp a.au b.au && a.name == b.name && a.chan == b.chan
@@ -3704,7 +3962,7 @@ type Reconciled
   = { prev :: Reconcilable
     , cur :: Reconcilable
     , reconciliation :: Map Int Int
-    , instructionSet :: List Instruction
+    , instructionSet :: Array Instruction
     }
 
 -- "Assembly like" instruction
@@ -3715,7 +3973,7 @@ data Instruction
   | DisconnectFrom Int Int -- id id
   | ConnectTo Int Int (Maybe (Tuple Int Int)) -- id id channelConnections
   | Shuffle (Array (Tuple Int Int)) -- id id, shuffles the map
-  | NewUnit Int AudioUnit'' (Maybe Int) (Maybe String) (Maybe Number) -- new audio unit, maybe with channel info, maybe with a source, maybe with a start time
+  | NewUnit Int AudioUnit'' (Maybe Int) (Maybe String) (Maybe Number) (Maybe Number) (Maybe (Tuple (Array Number) (Array Number))) -- new audio unit, maybe with channel info, maybe with a source, maybe with a start time, maybe with an offset, maybe with FF and FB info for IIR filter
   | SetFrequency Int Number Number -- frequency
   | SetThreshold Int Number Number -- threshold
   | SetKnee Int Number Number -- knee
@@ -3735,6 +3993,20 @@ data Instruction
   | SetDelay Int Number Number -- delay for delay node
   | SetOffset Int Number Number -- offset for const node
   | SetCustomParam Int String Number Number -- for audio worklet nodes
+  | SetConeInnerAngle Int Number
+  | SetConeOuterAngle Int Number
+  | SetConeOuterGain Int Number
+  | SetDistanceModel Int String
+  | SetMaxDistance Int Number
+  | SetOrientationX Int Number Number
+  | SetOrientationY Int Number Number
+  | SetOrientationZ Int Number Number
+  | SetPanningModel Int String
+  | SetPositionX Int Number Number
+  | SetPositionY Int Number Number
+  | SetPositionZ Int Number Number
+  | SetRefDistance Int Number
+  | SetRolloffFactor Int Number
 
 isStop_ :: Instruction -> Boolean
 isStop_ (Stop _) = true
@@ -3757,7 +4029,7 @@ isShuffle_ (Shuffle _) = true
 isShuffle_ _ = false
 
 isNewUnit_ :: Instruction -> Boolean
-isNewUnit_ (NewUnit _ _ _ _ _) = true
+isNewUnit_ (NewUnit _ _ _ _ _ _ _) = true
 
 isNewUnit_ _ = false
 
@@ -3856,6 +4128,76 @@ isSetCustomParam_ (SetCustomParam _ _ _ _) = true
 
 isSetCustomParam_ _ = false
 
+isSetConeInnerAngle_ :: Instruction -> Boolean
+isSetConeInnerAngle_ (SetConeInnerAngle _ _) = true
+
+isSetConeInnerAngle_ _ = false
+
+isSetConeOuterAngle_ :: Instruction -> Boolean
+isSetConeOuterAngle_ (SetConeOuterAngle _ _) = true
+
+isSetConeOuterAngle_ _ = false
+
+isSetConeOuterGain_ :: Instruction -> Boolean
+isSetConeOuterGain_ (SetConeOuterGain _ _) = true
+
+isSetConeOuterGain_ _ = false
+
+isSetDistanceModel_ :: Instruction -> Boolean
+isSetDistanceModel_ (SetDistanceModel _ _) = true
+
+isSetDistanceModel_ _ = false
+
+isSetMaxDistance_ :: Instruction -> Boolean
+isSetMaxDistance_ (SetMaxDistance _ _) = true
+
+isSetMaxDistance_ _ = false
+
+isSetOrientationX_ :: Instruction -> Boolean
+isSetOrientationX_ (SetOrientationX _ _ _) = true
+
+isSetOrientationX_ _ = false
+
+isSetOrientationY_ :: Instruction -> Boolean
+isSetOrientationY_ (SetOrientationY _ _ _) = true
+
+isSetOrientationY_ _ = false
+
+isSetOrientationZ_ :: Instruction -> Boolean
+isSetOrientationZ_ (SetOrientationZ _ _ _) = true
+
+isSetOrientationZ_ _ = false
+
+isSetPanningModel_ :: Instruction -> Boolean
+isSetPanningModel_ (SetPanningModel _ _) = true
+
+isSetPanningModel_ _ = false
+
+isSetPositionX_ :: Instruction -> Boolean
+isSetPositionX_ (SetPositionX _ _ _) = true
+
+isSetPositionX_ _ = false
+
+isSetPositionY_ :: Instruction -> Boolean
+isSetPositionY_ (SetPositionY _ _ _) = true
+
+isSetPositionY_ _ = false
+
+isSetPositionZ_ :: Instruction -> Boolean
+isSetPositionZ_ (SetPositionZ _ _ _) = true
+
+isSetPositionZ_ _ = false
+
+isSetRefDistance_ :: Instruction -> Boolean
+isSetRefDistance_ (SetRefDistance _ _) = true
+
+isSetRefDistance_ _ = false
+
+isSetRolloffFactor_ :: Instruction -> Boolean
+isSetRolloffFactor_ (SetRolloffFactor _ _) = true
+
+isSetRolloffFactor_ _ = false
+
 type FFIPredicates
   = { justly :: forall a. a -> Maybe a
     , tupply :: forall a b. a -> b -> Tuple a b
@@ -3867,6 +4209,7 @@ type FFIPredicates
     , isPlay :: (AudioUnit'' -> Boolean)
     , isPlayBuf :: (AudioUnit'' -> Boolean)
     , isLoopBuf :: (AudioUnit'' -> Boolean)
+    , isIIRFilter :: (AudioUnit'' -> Boolean)
     , isLowpass :: (AudioUnit'' -> Boolean)
     , isHighpass :: (AudioUnit'' -> Boolean)
     , isBandpass :: (AudioUnit'' -> Boolean)
@@ -3886,6 +4229,7 @@ type FFIPredicates
     , isSquareOsc :: (AudioUnit'' -> Boolean)
     , isSplitter :: (AudioUnit'' -> Boolean)
     , isStereoPanner :: (AudioUnit'' -> Boolean)
+    , isPanner :: (AudioUnit'' -> Boolean)
     , isMul :: (AudioUnit'' -> Boolean)
     , isAdd :: (AudioUnit'' -> Boolean)
     , isSwap :: (AudioUnit'' -> Boolean)
@@ -3921,6 +4265,20 @@ type FFIPredicates
     , isSetDelay :: (Instruction -> Boolean)
     , isSetOffset :: (Instruction -> Boolean)
     , isSetCustomParam :: (Instruction -> Boolean)
+    , isSetConeInnerAngle :: (Instruction -> Boolean)
+    , isSetConeOuterAngle :: (Instruction -> Boolean)
+    , isSetConeOuterGain :: (Instruction -> Boolean)
+    , isSetDistanceModel :: (Instruction -> Boolean)
+    , isSetMaxDistance :: (Instruction -> Boolean)
+    , isSetOrientationX :: (Instruction -> Boolean)
+    , isSetOrientationY :: (Instruction -> Boolean)
+    , isSetOrientationZ :: (Instruction -> Boolean)
+    , isSetPanningModel :: (Instruction -> Boolean)
+    , isSetPositionX :: (Instruction -> Boolean)
+    , isSetPositionY :: (Instruction -> Boolean)
+    , isSetPositionZ :: (Instruction -> Boolean)
+    , isSetRefDistance :: (Instruction -> Boolean)
+    , isSetRolloffFactor :: (Instruction -> Boolean)
     }
 
 toFFI =
@@ -3934,6 +4292,7 @@ toFFI =
   , isPlay: isPlay_
   , isPlayBuf: isPlayBuf_
   , isLoopBuf: isLoopBuf_
+  , isIIRFilter: isIIRFilter_
   , isLowpass: isLowpass_
   , isHighpass: isHighpass_
   , isBandpass: isBandpass_
@@ -3953,6 +4312,7 @@ toFFI =
   , isSquareOsc: isSquareOsc_
   , isSplitter: isSplitter_
   , isStereoPanner: isStereoPanner_
+  , isPanner: isPanner_
   , isMul: isMul_
   , isAdd: isAdd_
   , isSwap: isSwap_
@@ -3988,6 +4348,20 @@ toFFI =
   , isSetDelay: isSetDelay_
   , isSetOffset: isSetOffset_
   , isSetCustomParam: isSetCustomParam_
+  , isSetConeInnerAngle: isSetConeInnerAngle_
+  , isSetConeOuterAngle: isSetConeOuterAngle_
+  , isSetConeOuterGain: isSetConeOuterGain_
+  , isSetDistanceModel: isSetDistanceModel_
+  , isSetMaxDistance: isSetMaxDistance_
+  , isSetOrientationX: isSetOrientationX_
+  , isSetOrientationY: isSetOrientationY_
+  , isSetOrientationZ: isSetOrientationZ_
+  , isSetPanningModel: isSetPanningModel_
+  , isSetPositionX: isSetPositionX_
+  , isSetPositionY: isSetPositionY_
+  , isSetPositionZ: isSetPositionZ_
+  , isSetRefDistance: isSetRefDistance_
+  , isSetRolloffFactor: isSetRolloffFactor_
   } ::
     FFIPredicates
 
@@ -4014,7 +4388,7 @@ sourceConstructor (AudioWorkletProcessor' s _) = Just s
 
 sourceConstructor (AudioWorkletAggregator' s _) = Just s
 
-sourceConstructor (PlayBuf' s _) = Just s
+sourceConstructor (PlayBuf' s _ _) = Just s
 
 sourceConstructor (LoopBuf' s _ _ _) = Just s
 
@@ -4026,10 +4400,20 @@ sourceConstructor (Convolver' s) = Just s
 
 sourceConstructor _ = Nothing
 
+offsetConstructor :: AudioUnit' -> Maybe Number
+offsetConstructor (PlayBuf' _ _ o) = Just (apP o)
+
+offsetConstructor _ = Nothing
+
+iirCoefConstructor :: AudioUnit' -> Maybe (Tuple (Array Number) (Array Number))
+iirCoefConstructor (IIRFilter' x y) = Just (Tuple x y)
+
+iirCoefConstructor _ = Nothing
+
 startConstructor :: AudioUnit' -> Maybe Number
 startConstructor (Play' n timingHack) = Just timingHack
 
-startConstructor (PlayBuf' _ n) = Just (apT n)
+startConstructor (PlayBuf' _ n _) = Just (apT n)
 
 startConstructor (LoopBuf' _ n _ _) = Just (apT n)
 
@@ -4056,9 +4440,9 @@ os2s o = case o of
 napeq :: forall a. Eq a => AudioParameter a -> AudioParameter a -> Boolean
 napeq (AudioParameter { param: a }) (AudioParameter { param: b }) = a /= b
 
-describeConnection :: Reconcilable -> Reconcilable -> Map Int Int -> List (Tuple Int Int)
+describeConnection :: Reconcilable -> Reconcilable -> Map Int Int -> Array (Tuple Int Int)
 describeConnection start end passage =
-  (DL.fromFoldable <<< M.keys)
+  (A.fromFoldable <<< M.keys)
     ( M.filter
         ( \(Tuple f s) ->
             fromMaybe false
@@ -4094,7 +4478,7 @@ isGen (Microphone') = true
 -- this is a bad, as it will keep playing in the background after
 -- disconnected from the speaker
 -- find a way to disconnect
-isGen (PlayBuf' _ _) = true
+isGen (PlayBuf' _ _ _) = true
 
 isGen (LoopBuf' _ _ _ _) = true
 
@@ -4112,18 +4496,19 @@ isGen (Constant' _) = true
 
 isGen _ = false
 
-scp :: Int -> Object (AudioParameter Number) -> Object (AudioParameter Number) -> Array (Maybe Instruction)
+scp :: Int -> Object (AudioParameter Number) -> Object (AudioParameter Number) -> Array Instruction
 scp i n nx =
-  map
-    ( \(Tuple k0 v0) ->
-        if ( fromMaybe true
-            $ map (napeq v0) (O.lookup k0 nx)
-        ) then
-          Just $ SetCustomParam i k0 (apP v0) (apT v0)
-        else
-          Nothing
-    )
-    (O.toUnfoldable n)
+  join
+    $ map
+        ( \(Tuple k0 v0) ->
+            if ( fromMaybe true
+                $ map (napeq v0) (O.lookup k0 nx)
+            ) then
+              [ SetCustomParam i k0 (apP v0) (apT v0) ]
+            else
+              []
+        )
+        (O.toUnfoldable n)
 
 reconciliationToInstructionSet :: Reconciled' -> Reconciled
 reconciliationToInstructionSet { prev, cur, reconciliation } =
@@ -4164,45 +4549,44 @@ reconciliationToInstructionSet { prev, cur, reconciliation } =
     )
 
   -- turning off
+  stop :: Array Instruction
   stop =
     map (Stop <<< fst)
-      ( DL.filter
+      ( A.filter
           (maybe false (isGen <<< _.au) <<< flip M.lookup prev.flat <<< fst)
           $ statusChange (Just Off) (Just On)
       )
 
   -- shuffle instructions represent the new array that we will make out of the old
+  shuffle :: Instruction
   shuffle = Shuffle $ statusChange (Just On) (Just On)
 
   -- new units that were not in the old array
+  new :: Array Instruction
   new =
-    map
-      ((uncurry <<< uncurry <<< uncurry <<< uncurry) NewUnit)
-      ( DL.catMaybes
-          ( map
-              ( \i ->
-                  map
-                    ( \ptr ->
-                        ( Tuple
-                            ( Tuple
-                                (Tuple (Tuple i $ au'' ptr.au) (channelConstructor ptr.au))
-                                (sourceConstructor ptr.au)
-                            )
-                            (startConstructor ptr.au)
-                        )
-                    )
-                    $ M.lookup i cur.flat
-              )
-              ( DL.catMaybes
-                  ( map
-                      ( \k ->
-                          M.lookup k reconciliationAsMap
-                      )
-                      $ (DL.fromFoldable <<< M.keys) (M.filter (\i -> i.status == Off) prev.flat)
+    ( A.catMaybes
+        ( map
+            ( \i ->
+                map
+                  ( \ptr ->
+                      (NewUnit i $ au'' ptr.au) (channelConstructor ptr.au)
+                        (sourceConstructor ptr.au)
+                        (startConstructor ptr.au)
+                        (offsetConstructor ptr.au)
+                        (iirCoefConstructor ptr.au)
                   )
-              )
-          )
-      )
+                  $ M.lookup i cur.flat
+            )
+            ( A.catMaybes
+                ( map
+                    ( \k ->
+                        M.lookup k reconciliationAsMap
+                    )
+                    $ (A.fromFoldable <<< M.keys) (M.filter (\i -> i.status == Off) prev.flat)
+                )
+            )
+        )
+    )
 
   harmonizeCurrChannels' :: PtrInfo -> PtrInfo -> Maybe (Tuple Int Int)
   harmonizeCurrChannels' _ { au: SplitRes' n } = Just (Tuple n 0)
@@ -4218,6 +4602,7 @@ reconciliationToInstructionSet { prev, cur, reconciliation } =
       <$> (M.lookup l cur.flat)
       <*> (M.lookup r cur.flat)
 
+  connect :: Array Instruction
   connect =
     let
       conn = describeConnection cur prev reversedAsMap
@@ -4225,20 +4610,17 @@ reconciliationToInstructionSet { prev, cur, reconciliation } =
       (map (uncurry $ uncurry ConnectTo) $ map (\i -> Tuple i (harmonizeCurrChannels i)) conn)
 
   setFQFilter i a b x y =
-    [ if napeq a x then Just $ SetFrequency i (apP a) (apT a) else Nothing
-    , if napeq b y then Just $ SetQ i (apP b) (apT b) else Nothing
-    ]
+    (if napeq a x then [ SetFrequency i (apP a) (apT a) ] else [])
+      <> (if napeq b y then [ SetQ i (apP b) (apT b) ] else [])
 
   setFilter i a b c x y z =
-    [ if napeq a x then Just $ SetFrequency i (apP a) (apT a) else Nothing
-    , if napeq b y then Just $ SetQ i (apP b) (apT b) else Nothing
-    , if napeq c z then Just $ SetGain i (apP c) (apT c) else Nothing
-    ]
+    (if napeq a x then [ SetFrequency i (apP a) (apT a) ] else [])
+      <> (if napeq b y then [ SetQ i (apP b) (apT b) ] else [])
+      <> (if napeq c z then [ SetGain i (apP c) (apT c) ] else [])
 
   setFGFilter i a c x z =
-    [ if napeq a x then Just $ SetFrequency i (apP a) (apT a) else Nothing
-    , if napeq c z then Just $ SetGain i (apP c) (apT c) else Nothing
-    ]
+    (if napeq a x then [ SetFrequency i (apP a) (apT a) ] else [])
+      <> (if napeq c z then [ SetGain i (apP c) (apT c) ] else [])
 
   set' i (AudioWorkletGenerator' _ n) (AudioWorkletGenerator' _ nx) = scp i n nx
 
@@ -4246,13 +4628,12 @@ reconciliationToInstructionSet { prev, cur, reconciliation } =
 
   set' i (AudioWorkletAggregator' _ n) (AudioWorkletAggregator' _ nx) = scp i n nx
 
-  set' i (PlayBuf' _ n) (PlayBuf' _ nx) = pure $ if napeq n nx then Just $ SetPlaybackRate i (apP n) (apT n) else Nothing
+  set' i (PlayBuf' _ n _) (PlayBuf' _ nx _) = if napeq n nx then [ SetPlaybackRate i (apP n) (apT n) ] else []
 
   set' i (LoopBuf' _ n s e) (LoopBuf' _ nx sx ex) =
-    [ if napeq n nx then Just $ SetPlaybackRate i (apP n) (apT n) else Nothing
-    , if s /= sx then Just $ SetLoopStart i s else Nothing
-    , if e /= ex then Just $ SetLoopEnd i e else Nothing
-    ]
+    (if napeq n nx then [ SetPlaybackRate i (apP n) (apT n) ] else [])
+      <> (if s /= sx then [ SetLoopStart i s ] else [])
+      <> (if e /= ex then [ SetLoopEnd i e ] else [])
 
   set' i (Lowpass' a b) (Lowpass' x y) = setFQFilter i a b x y
 
@@ -4271,57 +4652,138 @@ reconciliationToInstructionSet { prev, cur, reconciliation } =
   set' i (Notch' a b) (Notch' x y) = setFQFilter i a b x y
 
   set' i (DynamicsCompressor' a b c d e) (DynamicsCompressor' v w x y z) =
-    [ if napeq a v then Just $ SetThreshold i (apP a) (apT a) else Nothing
-    , if napeq b w then Just $ SetKnee i (apP b) (apT b) else Nothing
-    , if napeq c x then Just $ SetRatio i (apP c) (apT c) else Nothing
-    , if napeq d y then Just $ SetAttack i (apP d) (apT d) else Nothing
-    , if napeq e z then Just $ SetRelease i (apP e) (apT e) else Nothing
-    ]
+    (if napeq a v then [ SetThreshold i (apP a) (apT a) ] else [])
+      <> (if napeq b w then [ SetKnee i (apP b) (apT b) ] else [])
+      <> (if napeq c x then [ SetRatio i (apP c) (apT c) ] else [])
+      <> (if napeq d y then [ SetAttack i (apP d) (apT d) ] else [])
+      <> (if napeq e z then [ SetRelease i (apP e) (apT e) ] else [])
 
-  set' i (SinOsc' n) (SinOsc' nx) = pure $ if napeq n nx then Just $ SetFrequency i (apP n) (apT n) else Nothing
+  set' i (SinOsc' n) (SinOsc' nx) = if napeq n nx then [ SetFrequency i (apP n) (apT n) ] else []
 
-  set' i (SquareOsc' n) (SquareOsc' nx) = pure $ if napeq n nx then Just $ SetFrequency i (apP n) (apT n) else Nothing
+  set' i (SquareOsc' n) (SquareOsc' nx) = if napeq n nx then [ SetFrequency i (apP n) (apT n) ] else []
 
-  set' i (SawtoothOsc' n) (SawtoothOsc' nx) = pure $ if napeq n nx then Just $ SetFrequency i (apP n) (apT n) else Nothing
+  set' i (SawtoothOsc' n) (SawtoothOsc' nx) = if napeq n nx then [ SetFrequency i (apP n) (apT n) ] else []
 
-  set' i (TriangleOsc' n) (TriangleOsc' nx) = pure $ if napeq n nx then Just $ SetFrequency i (apP n) (apT n) else Nothing
+  set' i (TriangleOsc' n) (TriangleOsc' nx) = if napeq n nx then [ SetFrequency i (apP n) (apT n) ] else []
 
-  set' i (PeriodicOsc' n _) (PeriodicOsc' nx _) = pure $ if napeq n nx then Just $ SetFrequency i (apP n) (apT n) else Nothing
+  set' i (PeriodicOsc' n _) (PeriodicOsc' nx _) = if napeq n nx then [ SetFrequency i (apP n) (apT n) ] else []
 
   set' i (WaveShaper' _ o) (WaveShaper' _ ox) =
-    [ if o /= ox then
-        Just
-          ( SetOversample i
-              $ os2s o
-          )
-      else
-        Nothing
-    ]
+    if o /= ox then
+      [ SetOversample i
+          $ os2s o
+      ]
+    else
+      []
 
-  set' i (StereoPanner' n) (StereoPanner' nx) = pure $ if napeq n nx then Just $ SetPan i (apP n) (apT n) else Nothing
+  set' i (StereoPanner' n) (StereoPanner' nx) = if napeq n nx then [ SetPan i (apP n) (apT n) ] else []
 
-  set' i (Constant' n) (Constant' nx) = pure $ if napeq n nx then Just $ SetOffset i (apP n) (apT n) else Nothing
-
-  set' i (Delay' n) (Delay' nx) = pure $ if napeq n nx then Just $ SetDelay i (apP n) (apT n) else Nothing
-
-  set' i (Gain' n) (Gain' nx) = pure $ if napeq n nx then Just $ SetGain i (apP n) (apT n) else Nothing
-
-  set' i _ _ = pure Nothing
-
-  -- NOTE:
-  -- roundtrip to array and back a little silly
-  -- makes it easier to type [] in set', though...
-  set =
-    (DL.catMaybes <<< DL.fromFoldable)
-      ( join
-          ( map
-              ( \v ->
-                  set' v.ptr v.au
-                    (fromMaybe v.au $ (map _.au $ M.lookup v.ptr reversedAsMap >>= flip M.lookup prev.flat))
-              )
-              (A.filter (\{ status } -> status == On) (A.fromFoldable $ M.values cur.flat))
-          )
+  set' i (Panner' n) (Panner' nx) =
+    ( ( if napeq n.coneInnerAngle nx.coneInnerAngle then
+          [ SetConeInnerAngle i (apP n.coneInnerAngle)
+          ]
+        else
+          []
       )
+        <> ( if napeq n.coneOuterAngle nx.coneOuterAngle then
+              [ SetConeOuterAngle i (apP n.coneOuterAngle)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.coneOuterGain nx.coneOuterGain then
+              [ SetConeOuterGain i (apP n.coneOuterGain)
+              ]
+            else
+              []
+          )
+        <> ( if n.distanceModel /= nx.distanceModel then
+              [ SetDistanceModel i (dm2str n.distanceModel)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.maxDistance nx.maxDistance then
+              [ SetMaxDistance i (apP n.maxDistance)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.orientationX nx.orientationX then
+              [ SetOrientationX i (apP n.orientationX) (apT n.orientationX)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.orientationY nx.orientationY then
+              [ SetOrientationY i (apP n.orientationY) (apT n.orientationY)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.orientationZ nx.orientationZ then
+              [ SetOrientationZ i (apP n.orientationZ) (apT n.orientationZ)
+              ]
+            else
+              []
+          )
+        <> ( if n.panningModel /= nx.panningModel then
+              [ SetPanningModel i (pm2str n.panningModel)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.positionX nx.positionX then
+              [ SetPositionX i (apP n.positionX) (apT n.positionX)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.positionY nx.positionY then
+              [ SetPositionY i (apP n.positionY) (apT n.positionY)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.positionZ nx.positionZ then
+              [ SetPositionZ i (apP n.positionZ) (apT n.positionZ)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.refDistance nx.refDistance then
+              [ SetRefDistance i (apP n.refDistance)
+              ]
+            else
+              []
+          )
+        <> ( if napeq n.rolloffFactor nx.rolloffFactor then
+              [ SetRolloffFactor i (apP n.rolloffFactor)
+              ]
+            else
+              []
+          )
+    )
+
+  set' i (Constant' n) (Constant' nx) = if napeq n nx then [ SetOffset i (apP n) (apT n) ] else []
+
+  set' i (Delay' n) (Delay' nx) = if napeq n nx then [ SetDelay i (apP n) (apT n) ] else []
+
+  set' i (Gain' n) (Gain' nx) = if napeq n nx then [ SetGain i (apP n) (apT n) ] else []
+
+  set' i _ _ = []
+
+  set :: Array Instruction
+  set =
+    ( join
+        ( map
+            ( \v ->
+                set' v.ptr v.au
+                  (fromMaybe v.au $ (map _.au $ M.lookup v.ptr reversedAsMap >>= flip M.lookup prev.flat))
+            )
+            (A.filter (\{ status } -> status == On) (A.fromFoldable $ M.values cur.flat))
+        )
+    )
 
 type AudioInfo microphones tracks buffers floatArrays periodicWaves
   = { microphones :: microphones
@@ -4421,6 +4883,7 @@ type EngineInfo
     , fastforwardLowerBound :: Number
     , rewindUpperBound :: Number
     , initialOffset :: Number
+    , doWebAudio :: Boolean
     }
 
 class RunnableMedia callback accumulator env where
@@ -4507,6 +4970,7 @@ instance avRunnableMedia :: Pos ch => RunnableMedia (accumulator -> CanvasInfo -
     __accumulator <- new accumulator
     __totalFromStart <- new 0.0
     ciRef <- new 0
+    __exporterQueueRef <- (launchAff $ pure unit) >>= new
     __totalTillProgram <- new 0.0
     __totalProgram <- new 0.0
     __totalPostProgram <- new 0.0
@@ -4623,12 +5087,13 @@ instance avRunnableMedia :: Pos ch => RunnableMedia (accumulator -> CanvasInfo -
                             let
                               instructions =
                                 { t: clockNow_
-                                , i: (A.fromFoldable instr.instructionSet)
+                                , i: instr.instructionSet
                                 }
-                            launchAff_
+                            exporterQueueRef <- read __exporterQueueRef
+                            launchAff
                               ( do
                                   env <- joinFiber fiber
-                                  ------ here!
+                                  _ <- joinFiber exporterQueueRef
                                   exporter.use
                                     env
                                     { id: curIt
@@ -4637,15 +5102,19 @@ instance avRunnableMedia :: Pos ch => RunnableMedia (accumulator -> CanvasInfo -
                                     , canvas: avv
                                     }
                               )
+                              >>= flip write __exporterQueueRef
                             uts <- read units
                             uts' <-
-                              touchAudio
-                                toFFI
-                                (audioClockStart + ((toNumber instructions.t + tOffset) / 1000.0))
-                                instructions.i
-                                ctx
-                                audioInfo
-                                uts
+                              if engineInfo.doWebAudio then
+                                touchAudio
+                                  toFFI
+                                  (audioClockStart + ((toNumber instructions.t + tOffset) / 1000.0))
+                                  instructions.i
+                                  ctx
+                                  audioInfo
+                                  uts
+                              else
+                                pure []
                             write uts' units
                             __endTime <- map getTime now
                             if (__endTime - __startTime) >= __contract then

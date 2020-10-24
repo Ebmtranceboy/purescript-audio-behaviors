@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8"> 
+  <head>
+    <meta charset="UTF-8">
+    <title>Purescript Audio Behaviors</title>
   </head>
 
   <script src="index.js"></script>
@@ -11,7 +12,7 @@
     function turnOnAudio() {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
-          return audioCtx.audioWorklet.addModule("https://klank-share.s3.eu-west-1.amazonaws.com/K16029410960343210.js");
+          return audioCtx.audioWorklet.addModule("K16029410960343210.js"); // https://klank-share.s3.eu-west-1.amazonaws.com/K16029410960343210.js 
         }).then(function () {
         offCb = PS["FRP.Behavior.Audio.Example.Karplus"].main(audioCtx)();
       });

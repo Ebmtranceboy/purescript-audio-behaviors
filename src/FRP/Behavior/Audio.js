@@ -316,6 +316,11 @@ exports.touchAudio = function (predicates) {
                     ? context.createBufferSource()
                     : predicates.isLoopBuf(c.value1)
                     ? context.createBufferSource()
+                    : predicates.isIIRFilter(c.value1)
+                    ? context.createIIRFilter(
+                        c.value6.value0.value0,
+                        c.value6.value0.value1
+                      )
                     : predicates.isLowpass(c.value1)
                     ? context.createBiquadFilter()
                     : predicates.isBandpass(c.value1)
@@ -348,6 +353,8 @@ exports.touchAudio = function (predicates) {
                     ? context.createGain()
                     : predicates.isStereoPanner(c.value1)
                     ? context.createStereoPanner()
+                    : predicates.isPanner(c.value1)
+                    ? context.createPanner()
                     : predicates.isSinOsc(c.value1)
                     ? context.createOscillator()
                     : predicates.isSquareOsc(c.value1)
@@ -454,7 +461,10 @@ exports.touchAudio = function (predicates) {
                     generators[c.value0].loop = false;
                     generators[c.value0].buffer =
                       audioInfo.buffers[c.value3.value0];
-                    generators[c.value0].start(timeToSet + c.value4.value0);
+                    generators[c.value0].start(
+                      timeToSet + c.value4.value0,
+                      c.value5.value0
+                    );
                   } else if (predicates.isPlay(c.value1)) {
                     // todo - if the same element is resumed via play it won't
                     // work in the current setup
@@ -603,6 +613,52 @@ exports.touchAudio = function (predicates) {
                     .linearRampToValueAtTime(c.value2, timeToSet + c.value3);
                 } else if (predicates.isStop(c)) {
                   generators[c.value0].stop();
+                } else if (predicates.isSetConeInnerAngle(c)) {
+                  generators[c.value0].coneInnerAngle = c.value1;
+                } else if (predicates.isSetConeOuterAngle(c)) {
+                  generators[c.value0].coneOuterAngle = c.value1;
+                } else if (predicates.isSetConeOuterGain(c)) {
+                  generators[c.value0].coneOuterGain = c.value1;
+                } else if (predicates.isSetDistanceModel(c)) {
+                  generators[c.value0].distanceModel = c.value1;
+                } else if (predicates.isSetMaxDistance(c)) {
+                  generators[c.value0].maxDistance = c.value1;
+                } else if (predicates.isSetOrientationX(c)) {
+                  generators[c.value0].orientationX.linearRampToValueAtTime(
+                    c.value1,
+                    timeToSet + c.value2
+                  );
+                } else if (predicates.isSetOrientationY(c)) {
+                  generators[c.value0].orientationY.linearRampToValueAtTime(
+                    c.value1,
+                    timeToSet + c.value2
+                  );
+                } else if (predicates.isSetOrientationZ(c)) {
+                  generators[c.value0].orientationZ.linearRampToValueAtTime(
+                    c.value1,
+                    timeToSet + c.value2
+                  );
+                } else if (predicates.isSetPanningModel(c)) {
+                  generators[c.value0].panningModel = c.value1;
+                } else if (predicates.isSetPositionX(c)) {
+                  generators[c.value0].positionX.linearRampToValueAtTime(
+                    c.value1,
+                    timeToSet + c.value2
+                  );
+                } else if (predicates.isSetPositionY(c)) {
+                  generators[c.value0].positionY.linearRampToValueAtTime(
+                    c.value1,
+                    timeToSet + c.value2
+                  );
+                } else if (predicates.isSetPositionZ(c)) {
+                  generators[c.value0].positionZ.linearRampToValueAtTime(
+                    c.value1,
+                    timeToSet + c.value2
+                  );
+                } else if (predicates.isSetRefDistance(c)) {
+                  generators[c.value0].refDistance = c.value1;
+                } else if (predicates.isSetRolloffFactor(c)) {
+                  generators[c.value0].rolloffFactor = c.value1;
                 }
               }
               return generators;

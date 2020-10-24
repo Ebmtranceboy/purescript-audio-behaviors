@@ -5926,6 +5926,11 @@ var PS = {};
                       ? context.createBufferSource()
                       : predicates.isLoopBuf(c.value1)
                       ? context.createBufferSource()
+                      : predicates.isIIRFilter(c.value1)
+                      ? context.createIIRFilter(
+                          c.value6.value0.value0,
+                          c.value6.value0.value1
+                        )
                       : predicates.isLowpass(c.value1)
                       ? context.createBiquadFilter()
                       : predicates.isBandpass(c.value1)
@@ -5958,6 +5963,8 @@ var PS = {};
                       ? context.createGain()
                       : predicates.isStereoPanner(c.value1)
                       ? context.createStereoPanner()
+                      : predicates.isPanner(c.value1)
+                      ? context.createPanner()
                       : predicates.isSinOsc(c.value1)
                       ? context.createOscillator()
                       : predicates.isSquareOsc(c.value1)
@@ -6064,7 +6071,10 @@ var PS = {};
                       generators[c.value0].loop = false;
                       generators[c.value0].buffer =
                         audioInfo.buffers[c.value3.value0];
-                      generators[c.value0].start(timeToSet + c.value4.value0);
+                      generators[c.value0].start(
+                        timeToSet + c.value4.value0,
+                        c.value5.value0
+                      );
                     } else if (predicates.isPlay(c.value1)) {
                       // todo - if the same element is resumed via play it won't
                       // work in the current setup
@@ -6213,6 +6223,52 @@ var PS = {};
                       .linearRampToValueAtTime(c.value2, timeToSet + c.value3);
                   } else if (predicates.isStop(c)) {
                     generators[c.value0].stop();
+                  } else if (predicates.isSetConeInnerAngle(c)) {
+                    generators[c.value0].coneInnerAngle = c.value1;
+                  } else if (predicates.isSetConeOuterAngle(c)) {
+                    generators[c.value0].coneOuterAngle = c.value1;
+                  } else if (predicates.isSetConeOuterGain(c)) {
+                    generators[c.value0].coneOuterGain = c.value1;
+                  } else if (predicates.isSetDistanceModel(c)) {
+                    generators[c.value0].distanceModel = c.value1;
+                  } else if (predicates.isSetMaxDistance(c)) {
+                    generators[c.value0].maxDistance = c.value1;
+                  } else if (predicates.isSetOrientationX(c)) {
+                    generators[c.value0].orientationX.linearRampToValueAtTime(
+                      c.value1,
+                      timeToSet + c.value2
+                    );
+                  } else if (predicates.isSetOrientationY(c)) {
+                    generators[c.value0].orientationY.linearRampToValueAtTime(
+                      c.value1,
+                      timeToSet + c.value2
+                    );
+                  } else if (predicates.isSetOrientationZ(c)) {
+                    generators[c.value0].orientationZ.linearRampToValueAtTime(
+                      c.value1,
+                      timeToSet + c.value2
+                    );
+                  } else if (predicates.isSetPanningModel(c)) {
+                    generators[c.value0].panningModel = c.value1;
+                  } else if (predicates.isSetPositionX(c)) {
+                    generators[c.value0].positionX.linearRampToValueAtTime(
+                      c.value1,
+                      timeToSet + c.value2
+                    );
+                  } else if (predicates.isSetPositionY(c)) {
+                    generators[c.value0].positionY.linearRampToValueAtTime(
+                      c.value1,
+                      timeToSet + c.value2
+                    );
+                  } else if (predicates.isSetPositionZ(c)) {
+                    generators[c.value0].positionZ.linearRampToValueAtTime(
+                      c.value1,
+                      timeToSet + c.value2
+                    );
+                  } else if (predicates.isSetRefDistance(c)) {
+                    generators[c.value0].refDistance = c.value1;
+                  } else if (predicates.isSetRolloffFactor(c)) {
+                    generators[c.value0].rolloffFactor = c.value1;
                   }
                 }
                 return generators;
@@ -7417,6 +7473,20 @@ var PS = {};
       Off.value = new Off();
       return Off;
   })();
+  var EqualPower = (function () {
+      function EqualPower() {
+
+      };
+      EqualPower.value = new EqualPower();
+      return EqualPower;
+  })();
+  var HRTF = (function () {
+      function HRTF() {
+
+      };
+      HRTF.value = new HRTF();
+      return HRTF;
+  })();
   var None = (function () {
       function None() {
 
@@ -7437,6 +7507,27 @@ var PS = {};
       };
       FourX.value = new FourX();
       return FourX;
+  })();
+  var Linear = (function () {
+      function Linear() {
+
+      };
+      Linear.value = new Linear();
+      return Linear;
+  })();
+  var Inverse = (function () {
+      function Inverse() {
+
+      };
+      Inverse.value = new Inverse();
+      return Inverse;
+  })();
+  var Exponential = (function () {
+      function Exponential() {
+
+      };
+      Exponential.value = new Exponential();
+      return Exponential;
   })();
   var Microphone$prime$prime = (function () {
       function Microphone$prime$prime() {
@@ -7486,6 +7577,13 @@ var PS = {};
       };
       LoopBuf$prime$prime.value = new LoopBuf$prime$prime();
       return LoopBuf$prime$prime;
+  })();
+  var IIRFilter$prime$prime = (function () {
+      function IIRFilter$prime$prime() {
+
+      };
+      IIRFilter$prime$prime.value = new IIRFilter$prime$prime();
+      return IIRFilter$prime$prime;
   })();
   var Lowpass$prime$prime = (function () {
       function Lowpass$prime$prime() {
@@ -7620,6 +7718,13 @@ var PS = {};
       StereoPanner$prime$prime.value = new StereoPanner$prime$prime();
       return StereoPanner$prime$prime;
   })();
+  var Panner$prime$prime = (function () {
+      function Panner$prime$prime() {
+
+      };
+      Panner$prime$prime.value = new Panner$prime$prime();
+      return Panner$prime$prime;
+  })();
   var Mul$prime$prime = (function () {
       function Mul$prime$prime() {
 
@@ -7743,19 +7848,25 @@ var PS = {};
       return Shuffle;
   })();
   var NewUnit = (function () {
-      function NewUnit(value0, value1, value2, value3, value4) {
+      function NewUnit(value0, value1, value2, value3, value4, value5, value6) {
           this.value0 = value0;
           this.value1 = value1;
           this.value2 = value2;
           this.value3 = value3;
           this.value4 = value4;
+          this.value5 = value5;
+          this.value6 = value6;
       };
       NewUnit.create = function (value0) {
           return function (value1) {
               return function (value2) {
                   return function (value3) {
                       return function (value4) {
-                          return new NewUnit(value0, value1, value2, value3, value4);
+                          return function (value5) {
+                              return function (value6) {
+                                  return new NewUnit(value0, value1, value2, value3, value4, value5, value6);
+                              };
+                          };
                       };
                   };
               };
@@ -8039,6 +8150,192 @@ var PS = {};
       };
       return SetCustomParam;
   })();
+  var SetConeInnerAngle = (function () {
+      function SetConeInnerAngle(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetConeInnerAngle.create = function (value0) {
+          return function (value1) {
+              return new SetConeInnerAngle(value0, value1);
+          };
+      };
+      return SetConeInnerAngle;
+  })();
+  var SetConeOuterAngle = (function () {
+      function SetConeOuterAngle(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetConeOuterAngle.create = function (value0) {
+          return function (value1) {
+              return new SetConeOuterAngle(value0, value1);
+          };
+      };
+      return SetConeOuterAngle;
+  })();
+  var SetConeOuterGain = (function () {
+      function SetConeOuterGain(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetConeOuterGain.create = function (value0) {
+          return function (value1) {
+              return new SetConeOuterGain(value0, value1);
+          };
+      };
+      return SetConeOuterGain;
+  })();
+  var SetDistanceModel = (function () {
+      function SetDistanceModel(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetDistanceModel.create = function (value0) {
+          return function (value1) {
+              return new SetDistanceModel(value0, value1);
+          };
+      };
+      return SetDistanceModel;
+  })();
+  var SetMaxDistance = (function () {
+      function SetMaxDistance(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetMaxDistance.create = function (value0) {
+          return function (value1) {
+              return new SetMaxDistance(value0, value1);
+          };
+      };
+      return SetMaxDistance;
+  })();
+  var SetOrientationX = (function () {
+      function SetOrientationX(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      SetOrientationX.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new SetOrientationX(value0, value1, value2);
+              };
+          };
+      };
+      return SetOrientationX;
+  })();
+  var SetOrientationY = (function () {
+      function SetOrientationY(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      SetOrientationY.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new SetOrientationY(value0, value1, value2);
+              };
+          };
+      };
+      return SetOrientationY;
+  })();
+  var SetOrientationZ = (function () {
+      function SetOrientationZ(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      SetOrientationZ.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new SetOrientationZ(value0, value1, value2);
+              };
+          };
+      };
+      return SetOrientationZ;
+  })();
+  var SetPanningModel = (function () {
+      function SetPanningModel(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetPanningModel.create = function (value0) {
+          return function (value1) {
+              return new SetPanningModel(value0, value1);
+          };
+      };
+      return SetPanningModel;
+  })();
+  var SetPositionX = (function () {
+      function SetPositionX(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      SetPositionX.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new SetPositionX(value0, value1, value2);
+              };
+          };
+      };
+      return SetPositionX;
+  })();
+  var SetPositionY = (function () {
+      function SetPositionY(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      SetPositionY.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new SetPositionY(value0, value1, value2);
+              };
+          };
+      };
+      return SetPositionY;
+  })();
+  var SetPositionZ = (function () {
+      function SetPositionZ(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      SetPositionZ.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new SetPositionZ(value0, value1, value2);
+              };
+          };
+      };
+      return SetPositionZ;
+  })();
+  var SetRefDistance = (function () {
+      function SetRefDistance(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetRefDistance.create = function (value0) {
+          return function (value1) {
+              return new SetRefDistance(value0, value1);
+          };
+      };
+      return SetRefDistance;
+  })();
+  var SetRolloffFactor = (function () {
+      function SetRolloffFactor(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      SetRolloffFactor.create = function (value0) {
+          return function (value1) {
+              return new SetRolloffFactor(value0, value1);
+          };
+      };
+      return SetRolloffFactor;
+  })();
   var Microphone$prime = (function () {
       function Microphone$prime() {
 
@@ -8095,13 +8392,16 @@ var PS = {};
       return Play$prime;
   })();
   var PlayBuf$prime = (function () {
-      function PlayBuf$prime(value0, value1) {
+      function PlayBuf$prime(value0, value1, value2) {
           this.value0 = value0;
           this.value1 = value1;
+          this.value2 = value2;
       };
       PlayBuf$prime.create = function (value0) {
           return function (value1) {
-              return new PlayBuf$prime(value0, value1);
+              return function (value2) {
+                  return new PlayBuf$prime(value0, value1, value2);
+              };
           };
       };
       return PlayBuf$prime;
@@ -8123,6 +8423,18 @@ var PS = {};
           };
       };
       return LoopBuf$prime;
+  })();
+  var IIRFilter$prime = (function () {
+      function IIRFilter$prime(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      IIRFilter$prime.create = function (value0) {
+          return function (value1) {
+              return new IIRFilter$prime(value0, value1);
+          };
+      };
+      return IIRFilter$prime;
   })();
   var Lowpass$prime = (function () {
       function Lowpass$prime(value0, value1) {
@@ -8338,6 +8650,15 @@ var PS = {};
       };
       return StereoPanner$prime;
   })();
+  var Panner$prime = (function () {
+      function Panner$prime(value0) {
+          this.value0 = value0;
+      };
+      Panner$prime.create = function (value0) {
+          return new Panner$prime(value0);
+      };
+      return Panner$prime;
+  })();
   var Mul$prime = (function () {
       function Mul$prime() {
 
@@ -8439,6 +8760,21 @@ var PS = {};
           };
       };
       return GAudioWorkletProcessor;
+  })();
+  var GIIRFilter = (function () {
+      function GIIRFilter(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      GIIRFilter.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new GIIRFilter(value0, value1, value2);
+              };
+          };
+      };
+      return GIIRFilter;
   })();
   var GLowpass = (function () {
       function GLowpass(value0, value1, value2) {
@@ -8626,6 +8962,18 @@ var PS = {};
       };
       return GStereoPanner;
   })();
+  var GPanner = (function () {
+      function GPanner(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      GPanner.create = function (value0) {
+          return function (value1) {
+              return new GPanner(value0, value1);
+          };
+      };
+      return GPanner;
+  })();
   var GDelay = (function () {
       function GDelay(value0, value1) {
           this.value0 = value0;
@@ -8759,15 +9107,18 @@ var PS = {};
       return Play;
   })();
   var PlayBuf = (function () {
-      function PlayBuf(value0, value1, value2) {
+      function PlayBuf(value0, value1, value2, value3) {
           this.value0 = value0;
           this.value1 = value1;
           this.value2 = value2;
+          this.value3 = value3;
       };
       PlayBuf.create = function (value0) {
           return function (value1) {
               return function (value2) {
-                  return new PlayBuf(value0, value1, value2);
+                  return function (value3) {
+                      return new PlayBuf(value0, value1, value2, value3);
+                  };
               };
           };
       };
@@ -8793,6 +9144,24 @@ var PS = {};
           };
       };
       return LoopBuf;
+  })();
+  var IIRFilter = (function () {
+      function IIRFilter(value0, value1, value2, value3) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+          this.value3 = value3;
+      };
+      IIRFilter.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return function (value3) {
+                      return new IIRFilter(value0, value1, value2, value3);
+                  };
+              };
+          };
+      };
+      return IIRFilter;
   })();
   var Lowpass = (function () {
       function Lowpass(value0, value1, value2, value3) {
@@ -9214,6 +9583,21 @@ var PS = {};
       };
       return Split5;
   })();
+  var Panner = (function () {
+      function Panner(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      Panner.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new Panner(value0, value1, value2);
+              };
+          };
+      };
+      return Panner;
+  })();
   var StereoPanner = (function () {
       function StereoPanner(value0, value1, value2) {
           this.value0 = value0;
@@ -9374,122 +9758,6 @@ var PS = {};
   var RunnableMedia = function (runInBrowser) {
       this.runInBrowser = runInBrowser;
   };
-  var ucomp = function (v) {
-      return function (v1) {
-          if (v instanceof Microphone$prime && v1 instanceof Microphone$prime) {
-              return true;
-          };
-          if (v instanceof AudioWorkletGenerator$prime && v1 instanceof AudioWorkletGenerator$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof AudioWorkletProcessor$prime && v1 instanceof AudioWorkletProcessor$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof AudioWorkletAggregator$prime && v1 instanceof AudioWorkletAggregator$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof Play$prime && v1 instanceof Play$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof PlayBuf$prime && v1 instanceof PlayBuf$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof LoopBuf$prime && v1 instanceof LoopBuf$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof Lowpass$prime && v1 instanceof Lowpass$prime) {
-              return true;
-          };
-          if (v instanceof Highpass$prime && v1 instanceof Highpass$prime) {
-              return true;
-          };
-          if (v instanceof Bandpass$prime && v1 instanceof Bandpass$prime) {
-              return true;
-          };
-          if (v instanceof Lowshelf$prime && v1 instanceof Lowshelf$prime) {
-              return true;
-          };
-          if (v instanceof Highshelf$prime && v1 instanceof Highshelf$prime) {
-              return true;
-          };
-          if (v instanceof Peaking$prime && v1 instanceof Peaking$prime) {
-              return true;
-          };
-          if (v instanceof Notch$prime && v1 instanceof Notch$prime) {
-              return true;
-          };
-          if (v instanceof Allpass$prime && v1 instanceof Allpass$prime) {
-              return true;
-          };
-          if (v instanceof Convolver$prime && v1 instanceof Convolver$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof DynamicsCompressor$prime && v1 instanceof DynamicsCompressor$prime) {
-              return true;
-          };
-          if (v instanceof SawtoothOsc$prime && v1 instanceof SawtoothOsc$prime) {
-              return true;
-          };
-          if (v instanceof TriangleOsc$prime && v1 instanceof TriangleOsc$prime) {
-              return true;
-          };
-          if (v instanceof PeriodicOsc$prime && v1 instanceof PeriodicOsc$prime) {
-              return v.value1 === v1.value1;
-          };
-          if (v instanceof WaveShaper$prime && v1 instanceof WaveShaper$prime) {
-              return v.value0 === v1.value0;
-          };
-          if (v instanceof Dup$prime && v1 instanceof Dup$prime) {
-              return true;
-          };
-          if (v instanceof SinOsc$prime && v1 instanceof SinOsc$prime) {
-              return true;
-          };
-          if (v instanceof SquareOsc$prime && v1 instanceof SquareOsc$prime) {
-              return true;
-          };
-          if (v instanceof Splitter$prime && v1 instanceof Splitter$prime) {
-              return true;
-          };
-          if (v instanceof StereoPanner$prime && v1 instanceof StereoPanner$prime) {
-              return true;
-          };
-          if (v instanceof Mul$prime && v1 instanceof Mul$prime) {
-              return true;
-          };
-          if (v instanceof Add$prime && v1 instanceof Add$prime) {
-              return true;
-          };
-          if (v instanceof Swap$prime && v1 instanceof Swap$prime) {
-              return true;
-          };
-          if (v instanceof Merger$prime && v1 instanceof Merger$prime) {
-              return true;
-          };
-          if (v instanceof Constant$prime && v1 instanceof Constant$prime) {
-              return true;
-          };
-          if (v instanceof Delay$prime && v1 instanceof Delay$prime) {
-              return true;
-          };
-          if (v instanceof Gain$prime && v1 instanceof Gain$prime) {
-              return true;
-          };
-          if (v instanceof Speaker$prime && v1 instanceof Speaker$prime) {
-              return true;
-          };
-          if (v instanceof NoSound$prime && v1 instanceof NoSound$prime) {
-              return true;
-          };
-          if (v instanceof SplitRes$prime && v1 instanceof SplitRes$prime) {
-              return true;
-          };
-          if (v instanceof DupRes$prime && v1 instanceof DupRes$prime) {
-              return true;
-          };
-          return false;
-      };
-  };
   var speaker = function (dictPos) {
       return Speaker.create(Data_Maybe.Nothing.value);
   };
@@ -9529,6 +9797,15 @@ var PS = {};
   var processors = function (dict) {
       return dict.processors;
   };
+  var pm2str = function (v) {
+      if (v instanceof EqualPower) {
+          return "equalpower";
+      };
+      if (v instanceof HRTF) {
+          return "HRTF";
+      };
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 846, column 1 - line 846, column 33): " + [ v.constructor.name ]);
+  };
   var play = function (dictPos) {
       return function (handle) {
           return new Play(Data_Maybe.Nothing.value, handle, 0.0);
@@ -9544,7 +9821,7 @@ var PS = {};
       if (o instanceof FourX) {
           return "4x";
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 4051, column 10 - line 4054, column 16): " + [ o.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 4435, column 10 - line 4438, column 16): " + [ o.constructor.name ]);
   };
   var nonEmptyListLength = function (v) {
       return Data_List.length(v.value1) + 1 | 0;
@@ -9574,7 +9851,7 @@ var PS = {};
       if (v instanceof Data_List_Types.Cons) {
           return Data_Maybe.Just.create(new Data_NonEmpty.NonEmpty(v.value0, v.value1));
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 3568, column 1 - line 3568, column 56): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 3826, column 1 - line 3826, column 56): " + [ v.constructor.name ]);
   };
   var isWaveShaper_ = function (v) {
       if (v instanceof WaveShaper$prime$prime) {
@@ -9665,8 +9942,20 @@ var PS = {};
       };
       return false;
   };
+  var isSetRolloffFactor_ = function (v) {
+      if (v instanceof SetRolloffFactor) {
+          return true;
+      };
+      return false;
+  };
   var isSetRelease_ = function (v) {
       if (v instanceof SetRelease) {
+          return true;
+      };
+      return false;
+  };
+  var isSetRefDistance_ = function (v) {
+      if (v instanceof SetRefDistance) {
           return true;
       };
       return false;
@@ -9683,6 +9972,24 @@ var PS = {};
       };
       return false;
   };
+  var isSetPositionZ_ = function (v) {
+      if (v instanceof SetPositionZ) {
+          return true;
+      };
+      return false;
+  };
+  var isSetPositionY_ = function (v) {
+      if (v instanceof SetPositionY) {
+          return true;
+      };
+      return false;
+  };
+  var isSetPositionX_ = function (v) {
+      if (v instanceof SetPositionX) {
+          return true;
+      };
+      return false;
+  };
   var isSetPlaybackRate_ = function (v) {
       if (v instanceof SetPlaybackRate) {
           return true;
@@ -9691,6 +9998,12 @@ var PS = {};
   };
   var isSetPeriodicWave_ = function (v) {
       if (v instanceof SetPeriodicWave) {
+          return true;
+      };
+      return false;
+  };
+  var isSetPanningModel_ = function (v) {
+      if (v instanceof SetPanningModel) {
           return true;
       };
       return false;
@@ -9707,8 +10020,32 @@ var PS = {};
       };
       return false;
   };
+  var isSetOrientationZ_ = function (v) {
+      if (v instanceof SetOrientationZ) {
+          return true;
+      };
+      return false;
+  };
+  var isSetOrientationY_ = function (v) {
+      if (v instanceof SetOrientationY) {
+          return true;
+      };
+      return false;
+  };
+  var isSetOrientationX_ = function (v) {
+      if (v instanceof SetOrientationX) {
+          return true;
+      };
+      return false;
+  };
   var isSetOffset_ = function (v) {
       if (v instanceof SetOffset) {
+          return true;
+      };
+      return false;
+  };
+  var isSetMaxDistance_ = function (v) {
+      if (v instanceof SetMaxDistance) {
           return true;
       };
       return false;
@@ -9743,6 +10080,12 @@ var PS = {};
       };
       return false;
   };
+  var isSetDistanceModel_ = function (v) {
+      if (v instanceof SetDistanceModel) {
+          return true;
+      };
+      return false;
+  };
   var isSetDelay_ = function (v) {
       if (v instanceof SetDelay) {
           return true;
@@ -9757,6 +10100,24 @@ var PS = {};
   };
   var isSetCurve_ = function (v) {
       if (v instanceof SetCurve) {
+          return true;
+      };
+      return false;
+  };
+  var isSetConeOuterGain_ = function (v) {
+      if (v instanceof SetConeOuterGain) {
+          return true;
+      };
+      return false;
+  };
+  var isSetConeOuterAngle_ = function (v) {
+      if (v instanceof SetConeOuterAngle) {
+          return true;
+      };
+      return false;
+  };
+  var isSetConeInnerAngle_ = function (v) {
+      if (v instanceof SetConeInnerAngle) {
           return true;
       };
       return false;
@@ -9799,6 +10160,12 @@ var PS = {};
   };
   var isPeaking_ = function (v) {
       if (v instanceof Peaking$prime$prime) {
+          return true;
+      };
+      return false;
+  };
+  var isPanner_ = function (v) {
+      if (v instanceof Panner$prime$prime) {
           return true;
       };
       return false;
@@ -9853,6 +10220,12 @@ var PS = {};
   };
   var isLoopBuf_ = function (v) {
       if (v instanceof LoopBuf$prime$prime) {
+          return true;
+      };
+      return false;
+  };
+  var isIIRFilter_ = function (v) {
+      if (v instanceof IIRFilter$prime$prime) {
           return true;
       };
       return false;
@@ -10000,6 +10373,7 @@ var PS = {};
       isPlay: isPlay_,
       isPlayBuf: isPlayBuf_,
       isLoopBuf: isLoopBuf_,
+      isIIRFilter: isIIRFilter_,
       isLowpass: isLowpass_,
       isHighpass: isHighpass_,
       isBandpass: isBandpass_,
@@ -10019,6 +10393,7 @@ var PS = {};
       isSquareOsc: isSquareOsc_,
       isSplitter: isSplitter_,
       isStereoPanner: isStereoPanner_,
+      isPanner: isPanner_,
       isMul: isMul_,
       isAdd: isAdd_,
       isSwap: isSwap_,
@@ -10053,15 +10428,35 @@ var PS = {};
       isSetGain: isSetGain_,
       isSetDelay: isSetDelay_,
       isSetOffset: isSetOffset_,
-      isSetCustomParam: isSetCustomParam_
+      isSetCustomParam: isSetCustomParam_,
+      isSetConeInnerAngle: isSetConeInnerAngle_,
+      isSetConeOuterAngle: isSetConeOuterAngle_,
+      isSetConeOuterGain: isSetConeOuterGain_,
+      isSetDistanceModel: isSetDistanceModel_,
+      isSetMaxDistance: isSetMaxDistance_,
+      isSetOrientationX: isSetOrientationX_,
+      isSetOrientationY: isSetOrientationY_,
+      isSetOrientationZ: isSetOrientationZ_,
+      isSetPanningModel: isSetPanningModel_,
+      isSetPositionX: isSetPositionX_,
+      isSetPositionY: isSetPositionY_,
+      isSetPositionZ: isSetPositionZ_,
+      isSetRefDistance: isSetRefDistance_,
+      isSetRolloffFactor: isSetRolloffFactor_
+  };
+  var iirCoefConstructor = function (v) {
+      if (v instanceof IIRFilter$prime) {
+          return new Data_Maybe.Just(new Data_Tuple.Tuple(v.value0, v.value1));
+      };
+      return Data_Maybe.Nothing.value;
   };             
   var getNextFromProcessors = function (k) {
       return function (pag) {
           return function (proc) {
               return Data_Set.fromFoldable(Data_Foldable.foldableArray)(Data_Ord.ordInt)(Data_Array.catMaybes(Data_Functor.map(Data_Functor.functorArray)((function () {
-                  var $4185 = Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordString))(pag);
-                  return function ($4186) {
-                      return $4185(Data_Tuple.fst($4186));
+                  var $5131 = Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordString))(pag);
+                  return function ($5132) {
+                      return $5131(Data_Tuple.fst($5132));
                   };
               })())(Data_Array.filter(function (v) {
                   return v.value1.value1 === k;
@@ -10073,9 +10468,9 @@ var PS = {};
       return function (pag) {
           return function (proc) {
               return Data_Set.fromFoldable(Data_Foldable.foldableArray)(Data_Ord.ordInt)(Data_Array.catMaybes(Data_Functor.map(Data_Functor.functorArray)((function () {
-                  var $4187 = Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordString))(pag);
-                  return function ($4188) {
-                      return $4187(Data_Tuple.fst($4188));
+                  var $5133 = Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordString))(pag);
+                  return function ($5134) {
+                      return $5133(Data_Tuple.fst($5134));
                   };
               })())(Data_Array.filter(function (v) {
                   return Data_Set.member(Data_Ord.ordString)(k)(v.value1.value1);
@@ -10091,10 +10486,10 @@ var PS = {};
       };
   };
   var getFirstCanvas = (function () {
-      var $4189 = Data_Functor.map(Data_Maybe.functorMaybe)(Data_Tuple.snd);
-      var $4190 = Foreign_Object.toUnfoldable(Data_Unfoldable.unfoldableArray);
-      return function ($4191) {
-          return $4189(Data_Array.head($4190($4191)));
+      var $5135 = Data_Functor.map(Data_Maybe.functorMaybe)(Data_Tuple.snd);
+      var $5136 = Foreign_Object.toUnfoldable(Data_Unfoldable.unfoldableArray);
+      return function ($5137) {
+          return $5135(Data_Array.head($5136($5137)));
       };
   })();
   var genericAudioUnit$prime$prime = new Data_Generic_Rep.Generic(function (x) {
@@ -10119,97 +10514,103 @@ var PS = {};
       if (x instanceof LoopBuf$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))));
       };
-      if (x instanceof Lowpass$prime$prime) {
+      if (x instanceof IIRFilter$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))));
       };
-      if (x instanceof Highpass$prime$prime) {
+      if (x instanceof Lowpass$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))));
       };
-      if (x instanceof Bandpass$prime$prime) {
+      if (x instanceof Highpass$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))));
       };
-      if (x instanceof Lowshelf$prime$prime) {
+      if (x instanceof Bandpass$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))));
       };
-      if (x instanceof Highshelf$prime$prime) {
+      if (x instanceof Lowshelf$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))));
       };
-      if (x instanceof Peaking$prime$prime) {
+      if (x instanceof Highshelf$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))));
       };
-      if (x instanceof Notch$prime$prime) {
+      if (x instanceof Peaking$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))));
       };
-      if (x instanceof Allpass$prime$prime) {
+      if (x instanceof Notch$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))));
       };
-      if (x instanceof Convolver$prime$prime) {
+      if (x instanceof Allpass$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))));
       };
-      if (x instanceof DynamicsCompressor$prime$prime) {
+      if (x instanceof Convolver$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))));
       };
-      if (x instanceof SawtoothOsc$prime$prime) {
+      if (x instanceof DynamicsCompressor$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))));
       };
-      if (x instanceof TriangleOsc$prime$prime) {
+      if (x instanceof SawtoothOsc$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))));
       };
-      if (x instanceof PeriodicOsc$prime$prime) {
+      if (x instanceof TriangleOsc$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))));
       };
-      if (x instanceof WaveShaper$prime$prime) {
+      if (x instanceof PeriodicOsc$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))));
       };
-      if (x instanceof Dup$prime$prime) {
+      if (x instanceof WaveShaper$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))));
       };
-      if (x instanceof SinOsc$prime$prime) {
+      if (x instanceof Dup$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))));
       };
-      if (x instanceof SquareOsc$prime$prime) {
+      if (x instanceof SinOsc$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))));
       };
-      if (x instanceof Splitter$prime$prime) {
+      if (x instanceof SquareOsc$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))));
       };
-      if (x instanceof StereoPanner$prime$prime) {
+      if (x instanceof Splitter$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))));
       };
-      if (x instanceof Mul$prime$prime) {
+      if (x instanceof StereoPanner$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))))));
       };
-      if (x instanceof Add$prime$prime) {
+      if (x instanceof Panner$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))));
       };
-      if (x instanceof Swap$prime$prime) {
+      if (x instanceof Mul$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))))))));
       };
-      if (x instanceof Merger$prime$prime) {
+      if (x instanceof Add$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))));
       };
-      if (x instanceof Constant$prime$prime) {
+      if (x instanceof Swap$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))))))))));
       };
-      if (x instanceof Delay$prime$prime) {
+      if (x instanceof Merger$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))))));
       };
-      if (x instanceof Gain$prime$prime) {
+      if (x instanceof Constant$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))))))))))));
       };
-      if (x instanceof Speaker$prime$prime) {
+      if (x instanceof Delay$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))))))));
       };
-      if (x instanceof NoSound$prime$prime) {
+      if (x instanceof Gain$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))))))))))))));
       };
-      if (x instanceof SplitRes$prime$prime) {
+      if (x instanceof Speaker$prime$prime) {
           return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))))))))));
       };
-      if (x instanceof DupRes$prime$prime) {
-          return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))))))))));
+      if (x instanceof NoSound$prime$prime) {
+          return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value)))))))))))))))))))))))))))))))))))));
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1159, column 1 - line 1159, column 60): " + [ x.constructor.name ]);
+      if (x instanceof SplitRes$prime$prime) {
+          return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inl(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))))))))))));
+      };
+      if (x instanceof DupRes$prime$prime) {
+          return new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(new Data_Generic_Rep.Inr(Data_Generic_Rep.NoArguments.value))))))))))))))))))))))))))))))))))))));
+      };
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1312, column 1 - line 1312, column 60): " + [ x.constructor.name ]);
   }, function (x) {
       if (x instanceof Data_Generic_Rep.Inl) {
           return Microphone$prime$prime.value;
@@ -10233,96 +10634,102 @@ var PS = {};
           return LoopBuf$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))) {
-          return Lowpass$prime$prime.value;
+          return IIRFilter$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))) {
-          return Highpass$prime$prime.value;
+          return Lowpass$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))) {
-          return Bandpass$prime$prime.value;
+          return Highpass$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))) {
-          return Lowshelf$prime$prime.value;
+          return Bandpass$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))) {
-          return Highshelf$prime$prime.value;
+          return Lowshelf$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))) {
-          return Peaking$prime$prime.value;
+          return Highshelf$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))) {
-          return Notch$prime$prime.value;
+          return Peaking$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))) {
-          return Allpass$prime$prime.value;
+          return Notch$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))) {
-          return Convolver$prime$prime.value;
+          return Allpass$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))) {
-          return DynamicsCompressor$prime$prime.value;
+          return Convolver$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))) {
-          return SawtoothOsc$prime$prime.value;
+          return DynamicsCompressor$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))) {
-          return TriangleOsc$prime$prime.value;
+          return SawtoothOsc$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))) {
-          return PeriodicOsc$prime$prime.value;
+          return TriangleOsc$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))) {
-          return WaveShaper$prime$prime.value;
+          return PeriodicOsc$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))) {
-          return Dup$prime$prime.value;
+          return WaveShaper$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))) {
-          return SinOsc$prime$prime.value;
+          return Dup$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))) {
-          return SquareOsc$prime$prime.value;
+          return SinOsc$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))) {
-          return Splitter$prime$prime.value;
+          return SquareOsc$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))) {
-          return StereoPanner$prime$prime.value;
+          return Splitter$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))))) {
-          return Mul$prime$prime.value;
+          return StereoPanner$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))))) {
-          return Add$prime$prime.value;
+          return Panner$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))))))) {
-          return Swap$prime$prime.value;
+          return Mul$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))))))) {
-          return Merger$prime$prime.value;
+          return Add$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))))))))) {
-          return Constant$prime$prime.value;
+          return Swap$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))))))))) {
-          return Delay$prime$prime.value;
+          return Merger$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))))))))))) {
-          return Gain$prime$prime.value;
+          return Constant$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))))))))))) {
-          return Speaker$prime$prime.value;
+          return Delay$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))))))))))))) {
-          return NoSound$prime$prime.value;
+          return Gain$prime$prime.value;
       };
       if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))))))))))))) {
+          return Speaker$prime$prime.value;
+      };
+      if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl)))))))))))))))))))))))))))))))))))) {
+          return NoSound$prime$prime.value;
+      };
+      if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inl))))))))))))))))))))))))))))))))))))) {
           return SplitRes$prime$prime.value;
       };
-      if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr))))))))))))))))))))))))))))))))))) {
+      if (x instanceof Data_Generic_Rep.Inr && (x.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && (x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr && x.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0.value0 instanceof Data_Generic_Rep.Inr))))))))))))))))))))))))))))))))))))) {
           return DupRes$prime$prime.value;
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1159, column 1 - line 1159, column 60): " + [ x.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1312, column 1 - line 1312, column 60): " + [ x.constructor.name ]);
   });
   var showAudioUnit$prime$prime = new Data_Show.Show(function (s) {
       return Data_Generic_Rep_Show.genericShow(genericAudioUnit$prime$prime)(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
@@ -10339,6 +10746,8 @@ var PS = {};
           return "PlayBuf''";
       })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
           return "LoopBuf''";
+      })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
+          return "IIRFilter''";
       })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
           return "Lowpass''";
       })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
@@ -10378,6 +10787,8 @@ var PS = {};
       })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
           return "StereoPanner''";
       })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
+          return "Panner''";
+      })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
           return "Mul''";
       })))(Data_Generic_Rep_Show.genericShowSum(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
           return "Add''";
@@ -10399,17 +10810,28 @@ var PS = {};
           return "SplitRes''";
       })))(Data_Generic_Rep_Show.genericShowConstructor(Data_Generic_Rep_Show.genericShowArgsNoArguments)(new Data_Symbol.IsSymbol(function () {
           return "DupRes''";
-      })))))))))))))))))))))))))))))))))))))))(s);
+      })))))))))))))))))))))))))))))))))))))))))(s);
   });
   var generators = function (dict) {
       return dict.generators;
-  };
+  };                                                  
   var eqStatus = new Data_Eq.Eq(function (x) {
       return function (y) {
           if (x instanceof On && y instanceof On) {
               return true;
           };
           if (x instanceof Off && y instanceof Off) {
+              return true;
+          };
+          return false;
+      };
+  });
+  var eqPanningModel = new Data_Eq.Eq(function (x) {
+      return function (y) {
+          if (x instanceof EqualPower && y instanceof EqualPower) {
+              return true;
+          };
+          if (x instanceof HRTF && y instanceof HRTF) {
               return true;
           };
           return false;
@@ -10429,6 +10851,142 @@ var PS = {};
           return false;
       };
   });
+  var eqDistanceModel = new Data_Eq.Eq(function (x) {
+      return function (y) {
+          if (x instanceof Linear && y instanceof Linear) {
+              return true;
+          };
+          if (x instanceof Inverse && y instanceof Inverse) {
+              return true;
+          };
+          if (x instanceof Exponential && y instanceof Exponential) {
+              return true;
+          };
+          return false;
+      };
+  });
+  var ucomp = function (v) {
+      return function (v1) {
+          if (v instanceof Microphone$prime && v1 instanceof Microphone$prime) {
+              return true;
+          };
+          if (v instanceof AudioWorkletGenerator$prime && v1 instanceof AudioWorkletGenerator$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof AudioWorkletProcessor$prime && v1 instanceof AudioWorkletProcessor$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof AudioWorkletAggregator$prime && v1 instanceof AudioWorkletAggregator$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof Play$prime && v1 instanceof Play$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof PlayBuf$prime && v1 instanceof PlayBuf$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof LoopBuf$prime && v1 instanceof LoopBuf$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof Lowpass$prime && v1 instanceof Lowpass$prime) {
+              return true;
+          };
+          if (v instanceof IIRFilter$prime && v1 instanceof IIRFilter$prime) {
+              return Data_Eq.eq(Data_Eq.eqArray(Data_Eq.eqNumber))(v.value0)(v1.value0) && Data_Eq.eq(Data_Eq.eqArray(Data_Eq.eqNumber))(v.value1)(v1.value1);
+          };
+          if (v instanceof Highpass$prime && v1 instanceof Highpass$prime) {
+              return true;
+          };
+          if (v instanceof Bandpass$prime && v1 instanceof Bandpass$prime) {
+              return true;
+          };
+          if (v instanceof Lowshelf$prime && v1 instanceof Lowshelf$prime) {
+              return true;
+          };
+          if (v instanceof Highshelf$prime && v1 instanceof Highshelf$prime) {
+              return true;
+          };
+          if (v instanceof Peaking$prime && v1 instanceof Peaking$prime) {
+              return true;
+          };
+          if (v instanceof Notch$prime && v1 instanceof Notch$prime) {
+              return true;
+          };
+          if (v instanceof Allpass$prime && v1 instanceof Allpass$prime) {
+              return true;
+          };
+          if (v instanceof Convolver$prime && v1 instanceof Convolver$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof DynamicsCompressor$prime && v1 instanceof DynamicsCompressor$prime) {
+              return true;
+          };
+          if (v instanceof SawtoothOsc$prime && v1 instanceof SawtoothOsc$prime) {
+              return true;
+          };
+          if (v instanceof TriangleOsc$prime && v1 instanceof TriangleOsc$prime) {
+              return true;
+          };
+          if (v instanceof PeriodicOsc$prime && v1 instanceof PeriodicOsc$prime) {
+              return v.value1 === v1.value1;
+          };
+          if (v instanceof WaveShaper$prime && v1 instanceof WaveShaper$prime) {
+              return v.value0 === v1.value0;
+          };
+          if (v instanceof Dup$prime && v1 instanceof Dup$prime) {
+              return true;
+          };
+          if (v instanceof SinOsc$prime && v1 instanceof SinOsc$prime) {
+              return true;
+          };
+          if (v instanceof SquareOsc$prime && v1 instanceof SquareOsc$prime) {
+              return true;
+          };
+          if (v instanceof Splitter$prime && v1 instanceof Splitter$prime) {
+              return true;
+          };
+          if (v instanceof StereoPanner$prime && v1 instanceof StereoPanner$prime) {
+              return true;
+          };
+          if (v instanceof Panner$prime && v1 instanceof Panner$prime) {
+              return Data_Eq.eq(eqDistanceModel)(v.value0.distanceModel)(v1.value0.distanceModel) && Data_Eq.eq(eqPanningModel)(v.value0.panningModel)(v1.value0.panningModel);
+          };
+          if (v instanceof Mul$prime && v1 instanceof Mul$prime) {
+              return true;
+          };
+          if (v instanceof Add$prime && v1 instanceof Add$prime) {
+              return true;
+          };
+          if (v instanceof Swap$prime && v1 instanceof Swap$prime) {
+              return true;
+          };
+          if (v instanceof Merger$prime && v1 instanceof Merger$prime) {
+              return true;
+          };
+          if (v instanceof Constant$prime && v1 instanceof Constant$prime) {
+              return true;
+          };
+          if (v instanceof Delay$prime && v1 instanceof Delay$prime) {
+              return true;
+          };
+          if (v instanceof Gain$prime && v1 instanceof Gain$prime) {
+              return true;
+          };
+          if (v instanceof Speaker$prime && v1 instanceof Speaker$prime) {
+              return true;
+          };
+          if (v instanceof NoSound$prime && v1 instanceof NoSound$prime) {
+              return true;
+          };
+          if (v instanceof SplitRes$prime && v1 instanceof SplitRes$prime) {
+              return true;
+          };
+          if (v instanceof DupRes$prime && v1 instanceof DupRes$prime) {
+              return true;
+          };
+          return false;
+      };
+  };
   var eqAudioUnit$prime$prime = new Data_Eq.Eq(function (x) {
       return function (y) {
           if (x instanceof Microphone$prime$prime && y instanceof Microphone$prime$prime) {
@@ -10450,6 +11008,9 @@ var PS = {};
               return true;
           };
           if (x instanceof LoopBuf$prime$prime && y instanceof LoopBuf$prime$prime) {
+              return true;
+          };
+          if (x instanceof IIRFilter$prime$prime && y instanceof IIRFilter$prime$prime) {
               return true;
           };
           if (x instanceof Lowpass$prime$prime && y instanceof Lowpass$prime$prime) {
@@ -10507,6 +11068,9 @@ var PS = {};
               return true;
           };
           if (x instanceof StereoPanner$prime$prime && y instanceof StereoPanner$prime$prime) {
+              return true;
+          };
+          if (x instanceof Panner$prime$prime && y instanceof Panner$prime$prime) {
               return true;
           };
           if (x instanceof Mul$prime$prime && y instanceof Mul$prime$prime) {
@@ -10600,10 +11164,13 @@ var PS = {};
               return x.value0 === y.value0 && x.value1 === y.value1;
           };
           if (x instanceof PlayBuf$prime && y instanceof PlayBuf$prime) {
-              return x.value0 === y.value0 && Data_Eq.eq(eqAPNum)(x.value1)(y.value1);
+              return x.value0 === y.value0 && Data_Eq.eq(eqAPNum)(x.value1)(y.value1) && Data_Eq.eq(eqAPNum)(x.value2)(y.value2);
           };
           if (x instanceof LoopBuf$prime && y instanceof LoopBuf$prime) {
               return x.value0 === y.value0 && Data_Eq.eq(eqAPNum)(x.value1)(y.value1) && x.value2 === y.value2 && x.value3 === y.value3;
+          };
+          if (x instanceof IIRFilter$prime && y instanceof IIRFilter$prime) {
+              return Data_Eq.eq(Data_Eq.eqArray(Data_Eq.eqNumber))(x.value0)(y.value0) && Data_Eq.eq(Data_Eq.eqArray(Data_Eq.eqNumber))(x.value1)(y.value1);
           };
           if (x instanceof Lowpass$prime && y instanceof Lowpass$prime) {
               return Data_Eq.eq(eqAPNum)(x.value0)(y.value0) && Data_Eq.eq(eqAPNum)(x.value1)(y.value1);
@@ -10661,6 +11228,9 @@ var PS = {};
           };
           if (x instanceof StereoPanner$prime && y instanceof StereoPanner$prime) {
               return Data_Eq.eq(eqAPNum)(x.value0)(y.value0);
+          };
+          if (x instanceof Panner$prime && y instanceof Panner$prime) {
+              return Data_Eq.eq(eqAPNum)(x.value0.coneInnerAngle)(y.value0.coneInnerAngle) && Data_Eq.eq(eqAPNum)(x.value0.coneOuterAngle)(y.value0.coneOuterAngle) && Data_Eq.eq(eqAPNum)(x.value0.coneOuterGain)(y.value0.coneOuterGain) && Data_Eq.eq(eqDistanceModel)(x.value0.distanceModel)(y.value0.distanceModel) && Data_Eq.eq(eqAPNum)(x.value0.maxDistance)(y.value0.maxDistance) && Data_Eq.eq(eqAPNum)(x.value0.orientationX)(y.value0.orientationX) && Data_Eq.eq(eqAPNum)(x.value0.orientationY)(y.value0.orientationY) && Data_Eq.eq(eqAPNum)(x.value0.orientationZ)(y.value0.orientationZ) && Data_Eq.eq(eqPanningModel)(x.value0.panningModel)(y.value0.panningModel) && Data_Eq.eq(eqAPNum)(x.value0.positionX)(y.value0.positionX) && Data_Eq.eq(eqAPNum)(x.value0.positionY)(y.value0.positionY) && Data_Eq.eq(eqAPNum)(x.value0.positionZ)(y.value0.positionZ) && Data_Eq.eq(eqAPNum)(x.value0.refDistance)(y.value0.refDistance) && Data_Eq.eq(eqAPNum)(x.value0.rolloffFactor)(y.value0.rolloffFactor);
           };
           if (x instanceof Mul$prime && y instanceof Mul$prime) {
               return true;
@@ -10729,17 +11299,29 @@ var PS = {};
           y: 0.0
       }
   };
+  var dm2str = function (v) {
+      if (v instanceof Linear) {
+          return "linear";
+      };
+      if (v instanceof Inverse) {
+          return "inverse";
+      };
+      if (v instanceof Exponential) {
+          return "exponential";
+      };
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 828, column 1 - line 828, column 34): " + [ v.constructor.name ]);
+  };
   var describeConnection = function (start) {
       return function (end) {
           return function (passage) {
-              return Data_List.fromFoldable(Data_Set.foldableSet)(Data_Map.keys(Data_Map_Internal.filter(Data_Tuple.ordTuple(Data_Ord.ordInt)(Data_Ord.ordInt))(function (v) {
+              return Data_Array.fromFoldable(Data_Set.foldableSet)(Data_Map.keys(Data_Map_Internal.filter(Data_Tuple.ordTuple(Data_Ord.ordInt)(Data_Ord.ordInt))(function (v) {
                   return Data_Maybe.fromMaybe(false)(Data_Functor.map(Data_Maybe.functorMaybe)((function () {
-                      var $4198 = Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraBoolean);
-                      var $4199 = Data_Set.member(Data_Ord.ordInt)(v.value1);
-                      return function ($4200) {
-                          return $4198($4199((function (v1) {
+                      var $5144 = Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraBoolean);
+                      var $5145 = Data_Set.member(Data_Ord.ordInt)(v.value1);
+                      return function ($5146) {
+                          return $5144($5145((function (v1) {
                               return v1.next;
-                          })($4200)));
+                          })($5146)));
                       };
                   })())(Data_Map_Internal.lookup(Data_Ord.ordInt)(v.value0)(end.flat)));
               })(Data_Map_Internal.fromFoldable(Data_Tuple.ordTuple(Data_Ord.ordInt)(Data_Ord.ordInt))(Data_List_Types.foldableList)(Data_List.catMaybes(Data_Functor.map(Data_List_Types.functorList)(function (v) {
@@ -10768,7 +11350,7 @@ var PS = {};
       if (v instanceof Data_List_Types.Cons) {
           return v.value1;
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 771, column 1 - line 771, column 25): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 801, column 1 - line 801, column 25): " + [ v.constructor.name ]);
   };
   var channelConstructor = function (v) {
       if (v instanceof Merger$prime) {
@@ -10815,6 +11397,9 @@ var PS = {};
       };
       if (v instanceof LoopBuf$prime) {
           return LoopBuf$prime$prime.value;
+      };
+      if (v instanceof IIRFilter$prime) {
+          return IIRFilter$prime$prime.value;
       };
       if (v instanceof Lowpass$prime) {
           return Lowpass$prime$prime.value;
@@ -10873,6 +11458,9 @@ var PS = {};
       if (v instanceof StereoPanner$prime) {
           return StereoPanner$prime$prime.value;
       };
+      if (v instanceof Panner$prime) {
+          return Panner$prime$prime.value;
+      };
       if (v instanceof Mul$prime) {
           return Mul$prime$prime.value;
       };
@@ -10906,7 +11494,7 @@ var PS = {};
       if (v instanceof DupRes$prime) {
           return DupRes$prime$prime.value;
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1310, column 1 - line 1310, column 34): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1471, column 1 - line 1471, column 34): " + [ v.constructor.name ]);
   };
   var au$prime = function (dictPos) {
       return function (v) {
@@ -10942,13 +11530,19 @@ var PS = {};
           };
           if (v instanceof PlayBuf) {
               return {
-                  au: new PlayBuf$prime(v.value1, v.value2),
+                  au: new PlayBuf$prime(v.value1, v.value2, v.value3),
                   name: v.value0
               };
           };
           if (v instanceof LoopBuf) {
               return {
                   au: new LoopBuf$prime(v.value1, v.value2, v.value3, v.value4),
+                  name: v.value0
+              };
+          };
+          if (v instanceof IIRFilter) {
+              return {
+                  au: new IIRFilter$prime(v.value1, v.value2),
                   name: v.value0
               };
           };
@@ -11114,6 +11708,12 @@ var PS = {};
                   name: v.value0
               };
           };
+          if (v instanceof Panner) {
+              return {
+                  au: new Panner$prime(v.value1),
+                  name: v.value0
+              };
+          };
           if (v instanceof Mul) {
               return {
                   au: Mul$prime.value,
@@ -11180,7 +11780,7 @@ var PS = {};
                   name: Data_Maybe.Nothing.value
               };
           };
-          throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1210, column 1 - line 1210, column 82): " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1367, column 1 - line 1367, column 82): " + [ v.constructor.name ]);
       };
   };
   var ap_ = function (a) {
@@ -11191,10 +11791,10 @@ var PS = {};
   };
   var gain$prime = function (dictPos) {
       return function (n) {
-          var $4201 = Gain.create(Data_Maybe.Nothing.value)(ap_(n));
-          var $4202 = Data_NonEmpty.singleton(Data_List_Types.plusList);
-          return function ($4203) {
-              return $4201($4202($4203));
+          var $5147 = Gain.create(Data_Maybe.Nothing.value)(ap_(n));
+          var $5148 = Data_NonEmpty.singleton(Data_List_Types.plusList);
+          return function ($5149) {
+              return $5147($5148($5149));
           };
       };
   };
@@ -11230,10 +11830,13 @@ var PS = {};
           return new AudioWorkletAggregator$prime("", Foreign_Object.empty);
       };
       if (v instanceof PlayBuf$prime$prime) {
-          return new PlayBuf$prime("", ap_(-1.0));
+          return new PlayBuf$prime("", ap_(-1.0), ap_(-1.0));
       };
       if (v instanceof LoopBuf$prime$prime) {
           return new LoopBuf$prime("", ap_(-1.0), -1.0, -1.0);
+      };
+      if (v instanceof IIRFilter$prime$prime) {
+          return new IIRFilter$prime([  ], [  ]);
       };
       if (v instanceof Lowpass$prime$prime) {
           return new Lowpass$prime(ap_(-1.0), ap_(-1.0));
@@ -11289,6 +11892,24 @@ var PS = {};
       if (v instanceof Splitter$prime$prime) {
           return new Splitter$prime(-1 | 0);
       };
+      if (v instanceof Panner$prime$prime) {
+          return new Panner$prime({
+              coneInnerAngle: ap_(-3.0),
+              coneOuterAngle: ap_(-3.0),
+              coneOuterGain: ap_(-3.0),
+              distanceModel: Inverse.value,
+              maxDistance: ap_(-3.0),
+              orientationX: ap_(-3.0),
+              orientationY: ap_(-3.0),
+              orientationZ: ap_(-3.0),
+              panningModel: EqualPower.value,
+              positionX: ap_(-3.0),
+              positionY: ap_(-3.0),
+              positionZ: ap_(-3.0),
+              refDistance: ap_(-3.0),
+              rolloffFactor: ap_(-3.0)
+          });
+      };
       if (v instanceof StereoPanner$prime$prime) {
           return new StereoPanner$prime(ap_(3.0));
       };
@@ -11325,7 +11946,7 @@ var PS = {};
       if (v instanceof DupRes$prime$prime) {
           return DupRes$prime.value;
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1385, column 1 - line 1385, column 37): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1550, column 1 - line 1550, column 37): " + [ v.constructor.name ]);
   };
   var makeContiguousUnits = function (v) {
       return function (v1) {
@@ -11384,16 +12005,22 @@ var PS = {};
   var apP = function (v) {
       return v.param;
   };
+  var offsetConstructor = function (v) {
+      if (v instanceof PlayBuf$prime) {
+          return new Data_Maybe.Just(apP(v.value2));
+      };
+      return Data_Maybe.Nothing.value;
+  };
   var scp = function (i) {
       return function (n) {
           return function (nx) {
-              return Data_Functor.map(Data_Functor.functorArray)(function (v) {
-                  var $3775 = Data_Maybe.fromMaybe(true)(Data_Functor.map(Data_Maybe.functorMaybe)(napeq(Data_Eq.eqNumber)(v.value1))(Foreign_Object.lookup(v.value0)(nx)));
-                  if ($3775) {
-                      return Data_Maybe.Just.create(new SetCustomParam(i, v.value0, apP(v.value1), apT(v.value1)));
+              return Control_Bind.join(Control_Bind.bindArray)(Data_Functor.map(Data_Functor.functorArray)(function (v) {
+                  var $4681 = Data_Maybe.fromMaybe(true)(Data_Functor.map(Data_Maybe.functorMaybe)(napeq(Data_Eq.eqNumber)(v.value1))(Foreign_Object.lookup(v.value0)(nx)));
+                  if ($4681) {
+                      return [ new SetCustomParam(i, v.value0, apP(v.value1), apT(v.value1)) ];
                   };
-                  return Data_Maybe.Nothing.value;
-              })(Foreign_Object.toUnfoldable(Data_Unfoldable.unfoldableArray)(n));
+                  return [  ];
+              })(Foreign_Object.toUnfoldable(Data_Unfoldable.unfoldableArray)(n)));
           };
       };
   };
@@ -11405,25 +12032,25 @@ var PS = {};
                       return function (x) {
                           return function (y) {
                               return function (z) {
-                                  return [ (function () {
-                                      var $3779 = napeq(Data_Eq.eqNumber)(a)(x);
-                                      if ($3779) {
-                                          return Data_Maybe.Just.create(new SetFrequency(i, apP(a), apT(a)));
+                                  return Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                                      var $4685 = napeq(Data_Eq.eqNumber)(a)(x);
+                                      if ($4685) {
+                                          return [ new SetFrequency(i, apP(a), apT(a)) ];
                                       };
-                                      return Data_Maybe.Nothing.value;
-                                  })(), (function () {
-                                      var $3780 = napeq(Data_Eq.eqNumber)(b)(y);
-                                      if ($3780) {
-                                          return Data_Maybe.Just.create(new SetQ(i, apP(b), apT(b)));
+                                      return [  ];
+                                  })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                                      var $4686 = napeq(Data_Eq.eqNumber)(b)(y);
+                                      if ($4686) {
+                                          return [ new SetQ(i, apP(b), apT(b)) ];
                                       };
-                                      return Data_Maybe.Nothing.value;
-                                  })(), (function () {
-                                      var $3781 = napeq(Data_Eq.eqNumber)(c)(z);
-                                      if ($3781) {
-                                          return Data_Maybe.Just.create(new SetGain(i, apP(c), apT(c)));
+                                      return [  ];
+                                  })())((function () {
+                                      var $4687 = napeq(Data_Eq.eqNumber)(c)(z);
+                                      if ($4687) {
+                                          return [ new SetGain(i, apP(c), apT(c)) ];
                                       };
-                                      return Data_Maybe.Nothing.value;
-                                  })() ];
+                                      return [  ];
+                                  })()));
                               };
                           };
                       };
@@ -11436,19 +12063,19 @@ var PS = {};
               return function (b) {
                   return function (x) {
                       return function (y) {
-                          return [ (function () {
-                              var $3782 = napeq(Data_Eq.eqNumber)(a)(x);
-                              if ($3782) {
-                                  return Data_Maybe.Just.create(new SetFrequency(i, apP(a), apT(a)));
+                          return Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                              var $4688 = napeq(Data_Eq.eqNumber)(a)(x);
+                              if ($4688) {
+                                  return [ new SetFrequency(i, apP(a), apT(a)) ];
                               };
-                              return Data_Maybe.Nothing.value;
-                          })(), (function () {
-                              var $3783 = napeq(Data_Eq.eqNumber)(b)(y);
-                              if ($3783) {
-                                  return Data_Maybe.Just.create(new SetQ(i, apP(b), apT(b)));
+                              return [  ];
+                          })())((function () {
+                              var $4689 = napeq(Data_Eq.eqNumber)(b)(y);
+                              if ($4689) {
+                                  return [ new SetQ(i, apP(b), apT(b)) ];
                               };
-                              return Data_Maybe.Nothing.value;
-                          })() ];
+                              return [  ];
+                          })());
                       };
                   };
               };
@@ -11459,19 +12086,19 @@ var PS = {};
               return function (c) {
                   return function (x) {
                       return function (z) {
-                          return [ (function () {
-                              var $3784 = napeq(Data_Eq.eqNumber)(a)(x);
-                              if ($3784) {
-                                  return Data_Maybe.Just.create(new SetFrequency(i, apP(a), apT(a)));
+                          return Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                              var $4690 = napeq(Data_Eq.eqNumber)(a)(x);
+                              if ($4690) {
+                                  return [ new SetFrequency(i, apP(a), apT(a)) ];
                               };
-                              return Data_Maybe.Nothing.value;
-                          })(), (function () {
-                              var $3785 = napeq(Data_Eq.eqNumber)(c)(z);
-                              if ($3785) {
-                                  return Data_Maybe.Just.create(new SetGain(i, apP(c), apT(c)));
+                              return [  ];
+                          })())((function () {
+                              var $4691 = napeq(Data_Eq.eqNumber)(c)(z);
+                              if ($4691) {
+                                  return [ new SetGain(i, apP(c), apT(c)) ];
                               };
-                              return Data_Maybe.Nothing.value;
-                          })() ];
+                              return [  ];
+                          })());
                       };
                   };
               };
@@ -11490,34 +12117,32 @@ var PS = {};
                       return scp(i)(v1.value1)(v2.value1);
                   };
                   if (v1 instanceof PlayBuf$prime && v2 instanceof PlayBuf$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3801 = napeq(Data_Eq.eqNumber)(v1.value1)(v2.value1);
-                          if ($3801) {
-                              return Data_Maybe.Just.create(new SetPlaybackRate(i, apP(v1.value1), apT(v1.value1)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4707 = napeq(Data_Eq.eqNumber)(v1.value1)(v2.value1);
+                      if ($4707) {
+                          return [ new SetPlaybackRate(i, apP(v1.value1), apT(v1.value1)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof LoopBuf$prime && v2 instanceof LoopBuf$prime) {
-                      return [ (function () {
-                          var $3806 = napeq(Data_Eq.eqNumber)(v1.value1)(v2.value1);
-                          if ($3806) {
-                              return Data_Maybe.Just.create(new SetPlaybackRate(i, apP(v1.value1), apT(v1.value1)));
+                      return Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4714 = napeq(Data_Eq.eqNumber)(v1.value1)(v2.value1);
+                          if ($4714) {
+                              return [ new SetPlaybackRate(i, apP(v1.value1), apT(v1.value1)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })(), (function () {
-                          var $3807 = v1.value2 !== v2.value2;
-                          if ($3807) {
-                              return Data_Maybe.Just.create(new SetLoopStart(i, v1.value2));
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4715 = v1.value2 !== v2.value2;
+                          if ($4715) {
+                              return [ new SetLoopStart(i, v1.value2) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })(), (function () {
-                          var $3808 = v1.value3 !== v2.value3;
-                          if ($3808) {
-                              return Data_Maybe.Just.create(new SetLoopEnd(i, v1.value3));
+                          return [  ];
+                      })())((function () {
+                          var $4716 = v1.value3 !== v2.value3;
+                          if ($4716) {
+                              return [ new SetLoopEnd(i, v1.value3) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })() ];
+                          return [  ];
+                      })()));
                   };
                   if (v1 instanceof Lowpass$prime && v2 instanceof Lowpass$prime) {
                       return setFQFilter(i)(v1.value0)(v1.value1)(v2.value0)(v2.value1);
@@ -11544,140 +12169,207 @@ var PS = {};
                       return setFQFilter(i)(v1.value0)(v1.value1)(v2.value0)(v2.value1);
                   };
                   if (v1 instanceof DynamicsCompressor$prime && v2 instanceof DynamicsCompressor$prime) {
-                      return [ (function () {
-                          var $3851 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3851) {
-                              return Data_Maybe.Just.create(new SetThreshold(i, apP(v1.value0), apT(v1.value0)));
+                      return Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4759 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                          if ($4759) {
+                              return [ new SetThreshold(i, apP(v1.value0), apT(v1.value0)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })(), (function () {
-                          var $3852 = napeq(Data_Eq.eqNumber)(v1.value1)(v2.value1);
-                          if ($3852) {
-                              return Data_Maybe.Just.create(new SetKnee(i, apP(v1.value1), apT(v1.value1)));
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4760 = napeq(Data_Eq.eqNumber)(v1.value1)(v2.value1);
+                          if ($4760) {
+                              return [ new SetKnee(i, apP(v1.value1), apT(v1.value1)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })(), (function () {
-                          var $3853 = napeq(Data_Eq.eqNumber)(v1.value2)(v2.value2);
-                          if ($3853) {
-                              return Data_Maybe.Just.create(new SetRatio(i, apP(v1.value2), apT(v1.value2)));
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4761 = napeq(Data_Eq.eqNumber)(v1.value2)(v2.value2);
+                          if ($4761) {
+                              return [ new SetRatio(i, apP(v1.value2), apT(v1.value2)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })(), (function () {
-                          var $3854 = napeq(Data_Eq.eqNumber)(v1.value3)(v2.value3);
-                          if ($3854) {
-                              return Data_Maybe.Just.create(new SetAttack(i, apP(v1.value3), apT(v1.value3)));
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4762 = napeq(Data_Eq.eqNumber)(v1.value3)(v2.value3);
+                          if ($4762) {
+                              return [ new SetAttack(i, apP(v1.value3), apT(v1.value3)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })(), (function () {
-                          var $3855 = napeq(Data_Eq.eqNumber)(v1.value4)(v2.value4);
-                          if ($3855) {
-                              return Data_Maybe.Just.create(new SetRelease(i, apP(v1.value4), apT(v1.value4)));
+                          return [  ];
+                      })())((function () {
+                          var $4763 = napeq(Data_Eq.eqNumber)(v1.value4)(v2.value4);
+                          if ($4763) {
+                              return [ new SetRelease(i, apP(v1.value4), apT(v1.value4)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })() ];
+                          return [  ];
+                      })()))));
                   };
                   if (v1 instanceof SinOsc$prime && v2 instanceof SinOsc$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3866 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3866) {
-                              return Data_Maybe.Just.create(new SetFrequency(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4774 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4774) {
+                          return [ new SetFrequency(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof SquareOsc$prime && v2 instanceof SquareOsc$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3869 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3869) {
-                              return Data_Maybe.Just.create(new SetFrequency(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4777 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4777) {
+                          return [ new SetFrequency(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof SawtoothOsc$prime && v2 instanceof SawtoothOsc$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3872 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3872) {
-                              return Data_Maybe.Just.create(new SetFrequency(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4780 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4780) {
+                          return [ new SetFrequency(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof TriangleOsc$prime && v2 instanceof TriangleOsc$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3875 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3875) {
-                              return Data_Maybe.Just.create(new SetFrequency(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4783 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4783) {
+                          return [ new SetFrequency(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof PeriodicOsc$prime && v2 instanceof PeriodicOsc$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3878 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3878) {
-                              return Data_Maybe.Just.create(new SetFrequency(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4786 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4786) {
+                          return [ new SetFrequency(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof WaveShaper$prime && v2 instanceof WaveShaper$prime) {
-                      return [ (function () {
-                          var $3883 = Data_Eq.notEq(eqOversample)(v1.value1)(v2.value1);
-                          if ($3883) {
-                              return new Data_Maybe.Just(SetOversample.create(i)(os2s(v1.value1)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })() ];
+                      var $4791 = Data_Eq.notEq(eqOversample)(v1.value1)(v2.value1);
+                      if ($4791) {
+                          return [ SetOversample.create(i)(os2s(v1.value1)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof StereoPanner$prime && v2 instanceof StereoPanner$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3888 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3888) {
-                              return Data_Maybe.Just.create(new SetPan(i, apP(v1.value0), apT(v1.value0)));
+                      var $4796 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4796) {
+                          return [ new SetPan(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
+                  };
+                  if (v1 instanceof Panner$prime && v2 instanceof Panner$prime) {
+                      return Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4799 = napeq(Data_Eq.eqNumber)(v1.value0.coneInnerAngle)(v2.value0.coneInnerAngle);
+                          if ($4799) {
+                              return [ new SetConeInnerAngle(i, apP(v1.value0.coneInnerAngle)) ];
                           };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4800 = napeq(Data_Eq.eqNumber)(v1.value0.coneOuterAngle)(v2.value0.coneOuterAngle);
+                          if ($4800) {
+                              return [ new SetConeOuterAngle(i, apP(v1.value0.coneOuterAngle)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4801 = napeq(Data_Eq.eqNumber)(v1.value0.coneOuterGain)(v2.value0.coneOuterGain);
+                          if ($4801) {
+                              return [ new SetConeOuterGain(i, apP(v1.value0.coneOuterGain)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4802 = Data_Eq.notEq(eqDistanceModel)(v1.value0.distanceModel)(v2.value0.distanceModel);
+                          if ($4802) {
+                              return [ new SetDistanceModel(i, dm2str(v1.value0.distanceModel)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4803 = napeq(Data_Eq.eqNumber)(v1.value0.maxDistance)(v2.value0.maxDistance);
+                          if ($4803) {
+                              return [ new SetMaxDistance(i, apP(v1.value0.maxDistance)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4804 = napeq(Data_Eq.eqNumber)(v1.value0.orientationX)(v2.value0.orientationX);
+                          if ($4804) {
+                              return [ new SetOrientationX(i, apP(v1.value0.orientationX), apT(v1.value0.orientationX)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4805 = napeq(Data_Eq.eqNumber)(v1.value0.orientationY)(v2.value0.orientationY);
+                          if ($4805) {
+                              return [ new SetOrientationY(i, apP(v1.value0.orientationY), apT(v1.value0.orientationY)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4806 = napeq(Data_Eq.eqNumber)(v1.value0.orientationZ)(v2.value0.orientationZ);
+                          if ($4806) {
+                              return [ new SetOrientationZ(i, apP(v1.value0.orientationZ), apT(v1.value0.orientationZ)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4807 = Data_Eq.notEq(eqPanningModel)(v1.value0.panningModel)(v2.value0.panningModel);
+                          if ($4807) {
+                              return [ new SetPanningModel(i, pm2str(v1.value0.panningModel)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4808 = napeq(Data_Eq.eqNumber)(v1.value0.positionX)(v2.value0.positionX);
+                          if ($4808) {
+                              return [ new SetPositionX(i, apP(v1.value0.positionX), apT(v1.value0.positionX)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4809 = napeq(Data_Eq.eqNumber)(v1.value0.positionY)(v2.value0.positionY);
+                          if ($4809) {
+                              return [ new SetPositionY(i, apP(v1.value0.positionY), apT(v1.value0.positionY)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4810 = napeq(Data_Eq.eqNumber)(v1.value0.positionZ)(v2.value0.positionZ);
+                          if ($4810) {
+                              return [ new SetPositionZ(i, apP(v1.value0.positionZ), apT(v1.value0.positionZ)) ];
+                          };
+                          return [  ];
+                      })())(Data_Semigroup.append(Data_Semigroup.semigroupArray)((function () {
+                          var $4811 = napeq(Data_Eq.eqNumber)(v1.value0.refDistance)(v2.value0.refDistance);
+                          if ($4811) {
+                              return [ new SetRefDistance(i, apP(v1.value0.refDistance)) ];
+                          };
+                          return [  ];
+                      })())((function () {
+                          var $4812 = napeq(Data_Eq.eqNumber)(v1.value0.rolloffFactor)(v2.value0.rolloffFactor);
+                          if ($4812) {
+                              return [ new SetRolloffFactor(i, apP(v1.value0.rolloffFactor)) ];
+                          };
+                          return [  ];
+                      })())))))))))))));
                   };
                   if (v1 instanceof Constant$prime && v2 instanceof Constant$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3891 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3891) {
-                              return Data_Maybe.Just.create(new SetOffset(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4815 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4815) {
+                          return [ new SetOffset(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof Delay$prime && v2 instanceof Delay$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3894 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3894) {
-                              return Data_Maybe.Just.create(new SetDelay(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4818 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4818) {
+                          return [ new SetDelay(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
                   if (v1 instanceof Gain$prime && v2 instanceof Gain$prime) {
-                      return Control_Applicative.pure(Control_Applicative.applicativeArray)((function () {
-                          var $3897 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
-                          if ($3897) {
-                              return Data_Maybe.Just.create(new SetGain(i, apP(v1.value0), apT(v1.value0)));
-                          };
-                          return Data_Maybe.Nothing.value;
-                      })());
+                      var $4821 = napeq(Data_Eq.eqNumber)(v1.value0)(v2.value0);
+                      if ($4821) {
+                          return [ new SetGain(i, apP(v1.value0), apT(v1.value0)) ];
+                      };
+                      return [  ];
                   };
-                  return Control_Applicative.pure(Control_Applicative.applicativeArray)(Data_Maybe.Nothing.value);
+                  return [  ];
               };
           };
       };
       var reversed = Data_Map_Internal.fromFoldable(Data_Ord.ordInt)(Data_Foldable.foldableArray)(Data_Functor.map(Data_Functor.functorArray)(Data_Tuple.swap)(Data_Map_Internal.toUnfoldable(Data_Unfoldable.unfoldableArray)(v.reconciliation)));
-      var set = Data_List.catMaybes(Data_List.fromFoldable(Data_Foldable.foldableArray)(Control_Bind.join(Control_Bind.bindArray)(Data_Functor.map(Data_Functor.functorArray)(function (v1) {
+      var set = Control_Bind.join(Control_Bind.bindArray)(Data_Functor.map(Data_Functor.functorArray)(function (v1) {
           return set$prime(v1.ptr)(v1.au)(Data_Maybe.fromMaybe(v1.au)(Data_Functor.map(Data_Maybe.functorMaybe)(function (v2) {
               return v2.au;
           })(Control_Bind.bind(Data_Maybe.bindMaybe)(Data_Map_Internal.lookup(Data_Ord.ordInt)(v1.ptr)(reversed))(Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordInt))(v.prev.flat)))));
       })(Data_Array.filter(function (v1) {
           return Data_Eq.eq(eqStatus)(v1.status)(On.value);
-      })(Data_Array.fromFoldable(Data_List_Types.foldableList)(Data_Map_Internal.values(v.cur.flat)))))));
+      })(Data_Array.fromFoldable(Data_List_Types.foldableList)(Data_Map_Internal.values(v.cur.flat)))));
       var statusChange = function (dictUnfoldable) {
           return function (isNow) {
               return function (was) {
@@ -11694,28 +12386,28 @@ var PS = {};
           };
       };
       var shuffle = Shuffle.create(statusChange(Data_Unfoldable.unfoldableArray)(new Data_Maybe.Just(On.value))(new Data_Maybe.Just(On.value)));
-      var stop = Data_Functor.map(Data_List_Types.functorList)(function ($4207) {
-          return Stop.create(Data_Tuple.fst($4207));
-      })(Data_List.filter((function () {
-          var $4208 = Data_Maybe.maybe(false)(function ($4211) {
+      var stop = Data_Functor.map(Data_Functor.functorArray)(function ($5169) {
+          return Stop.create(Data_Tuple.fst($5169));
+      })(Data_Array.filter((function () {
+          var $5170 = Data_Maybe.maybe(false)(function ($5173) {
               return isGen((function (v1) {
                   return v1.au;
-              })($4211));
+              })($5173));
           });
-          var $4209 = Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordInt))(v.prev.flat);
-          return function ($4210) {
-              return $4208($4209(Data_Tuple.fst($4210)));
+          var $5171 = Data_Function.flip(Data_Map_Internal.lookup(Data_Ord.ordInt))(v.prev.flat);
+          return function ($5172) {
+              return $5170($5171(Data_Tuple.fst($5172)));
           };
-      })())(statusChange(Data_List_Types.unfoldableList)(new Data_Maybe.Just(Off.value))(new Data_Maybe.Just(On.value))));
-      var $$new = Data_Functor.map(Data_List_Types.functorList)(Data_Tuple.uncurry(Data_Tuple.uncurry(Data_Tuple.uncurry(Data_Tuple.uncurry(NewUnit.create)))))(Data_List.catMaybes(Data_Functor.map(Data_List_Types.functorList)(function (i) {
+      })())(statusChange(Data_Unfoldable.unfoldableArray)(new Data_Maybe.Just(Off.value))(new Data_Maybe.Just(On.value))));
+      var $$new = Data_Array.catMaybes(Data_Functor.map(Data_Functor.functorArray)(function (i) {
           return Data_Functor.map(Data_Maybe.functorMaybe)(function (ptr) {
-              return new Data_Tuple.Tuple(new Data_Tuple.Tuple(new Data_Tuple.Tuple(Data_Tuple.Tuple.create(i)(au$prime$prime(ptr.au)), channelConstructor(ptr.au)), sourceConstructor(ptr.au)), startConstructor(ptr.au));
+              return NewUnit.create(i)(au$prime$prime(ptr.au))(channelConstructor(ptr.au))(sourceConstructor(ptr.au))(startConstructor(ptr.au))(offsetConstructor(ptr.au))(iirCoefConstructor(ptr.au));
           })(Data_Map_Internal.lookup(Data_Ord.ordInt)(i)(v.cur.flat));
-      })(Data_List.catMaybes(Data_Functor.map(Data_List_Types.functorList)(function (k) {
+      })(Data_Array.catMaybes(Data_Functor.map(Data_Functor.functorArray)(function (k) {
           return Data_Map_Internal.lookup(Data_Ord.ordInt)(k)(v.reconciliation);
-      })(Data_List.fromFoldable(Data_Set.foldableSet)(Data_Map.keys(Data_Map_Internal.filter(Data_Ord.ordInt)(function (i) {
+      })(Data_Array.fromFoldable(Data_Set.foldableSet)(Data_Map.keys(Data_Map_Internal.filter(Data_Ord.ordInt)(function (i) {
           return Data_Eq.eq(eqStatus)(i.status)(Off.value);
-      })(v.prev.flat))))))));
+      })(v.prev.flat)))))));
       var harmonizeCurrChannels$prime = function (v1) {
           return function (v2) {
               if (v2.au instanceof SplitRes$prime) {
@@ -11723,9 +12415,9 @@ var PS = {};
               };
               if (v2.au instanceof Merger$prime) {
                   return Data_List.head(Data_Functor.map(Data_List_Types.functorList)((function () {
-                      var $4212 = Data_Tuple.Tuple.create(0);
-                      return function ($4213) {
-                          return $4212(Data_Tuple.fst($4213));
+                      var $5174 = Data_Tuple.Tuple.create(0);
+                      return function ($5175) {
+                          return $5174(Data_Tuple.fst($5175));
                       };
                   })())(Data_List.filter(function (v3) {
                       return v1.ptr === v3.value1;
@@ -11741,10 +12433,10 @@ var PS = {};
       var harmonizeCurrChannels = function (v1) {
           return Data_Maybe.fromMaybe(Data_Maybe.Nothing.value)(Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(harmonizeCurrChannels$prime)(Data_Map_Internal.lookup(Data_Ord.ordInt)(v1.value0)(v.cur.flat)))(Data_Map_Internal.lookup(Data_Ord.ordInt)(v1.value1)(v.cur.flat)));
       };
-      var disconnect = Data_Functor.map(Data_List_Types.functorList)(Data_Tuple.uncurry(DisconnectFrom.create))(describeConnection(v.prev)(v.cur)(v.reconciliation));
+      var disconnect = Data_Functor.map(Data_Functor.functorArray)(Data_Tuple.uncurry(DisconnectFrom.create))(describeConnection(v.prev)(v.cur)(v.reconciliation));
       var connect = (function () {
           var conn = describeConnection(v.cur)(v.prev)(reversed);
-          return Data_Functor.map(Data_List_Types.functorList)(Data_Tuple.uncurry(Data_Tuple.uncurry(ConnectTo.create)))(Data_Functor.map(Data_List_Types.functorList)(function (i) {
+          return Data_Functor.map(Data_Functor.functorArray)(Data_Tuple.uncurry(Data_Tuple.uncurry(ConnectTo.create)))(Data_Functor.map(Data_Functor.functorArray)(function (i) {
               return new Data_Tuple.Tuple(i, harmonizeCurrChannels(i));
           })(conn));
       })();
@@ -11752,7 +12444,7 @@ var PS = {};
           prev: v.prev,
           cur: v.cur,
           reconciliation: v.reconciliation,
-          instructionSet: Data_Semigroup.append(Data_List_Types.semigroupList)(stop)(Data_Semigroup.append(Data_List_Types.semigroupList)(disconnect)(Data_Semigroup.append(Data_List_Types.semigroupList)(Control_Applicative.pure(Data_List_Types.applicativeList)(shuffle))(Data_Semigroup.append(Data_List_Types.semigroupList)($$new)(Data_Semigroup.append(Data_List_Types.semigroupList)(connect)(set)))))
+          instructionSet: Data_Semigroup.append(Data_Semigroup.semigroupArray)(stop)(Data_Semigroup.append(Data_Semigroup.semigroupArray)(disconnect)(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Control_Applicative.pure(Control_Applicative.applicativeArray)(shuffle))(Data_Semigroup.append(Data_Semigroup.semigroupArray)($$new)(Data_Semigroup.append(Data_Semigroup.semigroupArray)(connect)(set)))))
       };
   };
   var agp2au$prime = function (v) {
@@ -11765,6 +12457,12 @@ var PS = {};
       if (v instanceof GLowpass) {
           return {
               au: new Lowpass$prime(v.value1, v.value2),
+              name: v.value0
+          };
+      };
+      if (v instanceof GIIRFilter) {
+          return {
+              au: new IIRFilter$prime(v.value1, v.value2),
               name: v.value0
           };
       };
@@ -11840,7 +12538,13 @@ var PS = {};
               name: v.value0
           };
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1178, column 1 - line 1178, column 72): " + [ v.constructor.name ]);
+      if (v instanceof GPanner) {
+          return {
+              au: new Panner$prime(v.value1),
+              name: v.value0
+          };
+      };
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1331, column 1 - line 1331, column 72): " + [ v.constructor.name ]);
   };
   var chainsForProcessor = function (dictPos) {
       return function (nextIfTerminus) {
@@ -11858,8 +12562,8 @@ var PS = {};
                                               chan: Data_Typelevel_Num_Sets["toInt'"](dictPos.Nat0())(Type_Proxy["Proxy"].value),
                                               prev: Data_Set.singleton(pv),
                                               next: (function () {
-                                                  var $3970 = Data_Set.isEmpty(nexts);
-                                                  if ($3970) {
+                                                  var $4899 = Data_Set.isEmpty(nexts);
+                                                  if ($4899) {
                                                       return nextIfTerminus;
                                                   };
                                                   return nexts;
@@ -11912,7 +12616,7 @@ var PS = {};
               name: v.value0
           };
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1169, column 1 - line 1169, column 73): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1322, column 1 - line 1322, column 73): " + [ v.constructor.name ]);
   };
   var chainsForAggregator = function (dictPos) {
       return function (nextIfTerminus) {
@@ -11930,8 +12634,8 @@ var PS = {};
                                               chan: Data_Typelevel_Num_Sets["toInt'"](dictPos.Nat0())(Type_Proxy["Proxy"].value),
                                               prev: pv,
                                               next: (function () {
-                                                  var $3988 = Data_Set.isEmpty(nexts);
-                                                  if ($3988) {
+                                                  var $4917 = Data_Set.isEmpty(nexts);
+                                                  if ($4917) {
                                                       return nextIfTerminus;
                                                   };
                                                   return nexts;
@@ -12003,7 +12707,7 @@ var PS = {};
                           $copy_toModify = tm;
                           return;
                       };
-                      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 3598, column 3 - line 3598, column 66): " + [ v.constructor.name, toModify.constructor.name ]);
+                      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 3856, column 3 - line 3856, column 66): " + [ v.constructor.name, toModify.constructor.name ]);
                   };
                   while (!$tco_done) {
                       $tco_result = $tco_loop($tco_var_v, $copy_toModify);
@@ -12050,7 +12754,7 @@ var PS = {};
               name: v.value0.name
           })(new Data_NonEmpty.NonEmpty(v.value0, pt.yes)))(audioGrouper(pt.no));
       };
-      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 3533, column 1 - line 3535, column 15): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at FRP.Behavior.Audio (line 3791, column 1 - line 3793, column 15): " + [ v.constructor.name ]);
   };
   var a2c = function (dictPos) {
       return function (a) {
@@ -12155,8 +12859,8 @@ var PS = {};
                               }),
                               name: auHack.name
                           });
-                          var $4010 = Foreign_Object.size(g.aggregators) === 0 && (Foreign_Object.size(g.generators) === 0 && Foreign_Object.size(g.processors) === 0);
-                          if ($4010) {
+                          var $4939 = Foreign_Object.size(g.aggregators) === 0 && (Foreign_Object.size(g.generators) === 0 && Foreign_Object.size(g.processors) === 0);
+                          if ($4939) {
                               return {
                                   len: 1,
                                   flat: Data_Map_Internal.singleton(ptr.ptr)(dummy),
@@ -12233,6 +12937,9 @@ var PS = {};
                   };
                   if (v instanceof LoopBuf) {
                       return terminus(dictPos1)(ptr)(v);
+                  };
+                  if (v instanceof IIRFilter) {
+                      return passthrough(dictPos1)(ptr)(v)(v.value3);
                   };
                   if (v instanceof Lowpass) {
                       return passthrough(dictPos1)(ptr)(v)(v.value3);
@@ -12312,6 +13019,9 @@ var PS = {};
                   if (v instanceof StereoPanner) {
                       return passthrough(dictPos1)(ptr)(v)(v.value2);
                   };
+                  if (v instanceof Panner) {
+                      return passthrough(dictPos1)(ptr)(v)(v.value2);
+                  };
                   if (v instanceof Delay) {
                       return passthrough(dictPos1)(ptr)(v)(v.value2);
                   };
@@ -12348,7 +13058,7 @@ var PS = {};
                   if (v instanceof Graph) {
                       return graphthrough(dictPos1)(dictPos1)(ptr)(v)(v.value1);
                   };
-                  throw new Error("Failed pattern match at FRP.Behavior.Audio (line 1839, column 3 - line 1839, column 66): " + [ ptr.constructor.name, v.constructor.name ]);
+                  throw new Error("Failed pattern match at FRP.Behavior.Audio (line 2024, column 3 - line 2024, column 66): " + [ ptr.constructor.name, v.constructor.name ]);
               };
           };
       };
@@ -12414,6 +13124,7 @@ var PS = {};
                                       var __accumulator = Effect_Ref["new"](accumulator)();
                                       var __totalFromStart = Effect_Ref["new"](0.0)();
                                       var ciRef = Effect_Ref["new"](0)();
+                                      var __exporterQueueRef = Control_Bind.bind(Effect.bindEffect)(Effect_Aff.launchAff(Control_Applicative.pure(Effect_Aff.applicativeAff)(Data_Unit.unit)))(Effect_Ref["new"])();
                                       var __totalTillProgram = Effect_Ref["new"](0.0)();
                                       var __totalProgram = Effect_Ref["new"](0.0)();
                                       var __totalPostProgram = Effect_Ref["new"](0.0)();
@@ -12433,14 +13144,14 @@ var PS = {};
                                           Effect_Ref.write(curIt + 1 | 0)(ciRef)();
                                           var clockNow_ = Effect_Ref.read(clock)();
                                           var startingPosWRT = (Data_Int.toNumber(clockNow_) + engineInfo.initialOffset) / 1000.0 - (acc_ - audioClockStart);
-                                          var $4153 = startingPosWRT > engineInfo.rewindUpperBound;
-                                          if ($4153) {
+                                          var $5090 = startingPosWRT > engineInfo.rewindUpperBound;
+                                          if ($5090) {
                                               var newV = clockNow_ - engineInfo.msBetweenSamples | 0;
                                               return Effect_Ref.write(newV)(clock)();
                                           };
                                           (function () {
-                                              var $4154 = startingPosWRT < engineInfo.fastforwardLowerBound;
-                                              if ($4154) {
+                                              var $5091 = startingPosWRT < engineInfo.fastforwardLowerBound;
+                                              if ($5091) {
                                                   var newV = clockNow_ + engineInfo.msBetweenSamples | 0;
                                                   Effect_Class_Console.log(Effect_Class.monadEffectEffect)("Fastforwarding " + (Data_Show.show(Data_Show.showInt)(clockNow_) + (" " + (Data_Show.show(Data_Show.showInt)(newV) + (" " + Data_Show.show(Data_Show.showNumber)(startingPosWRT))))))();
                                                   return Effect_Ref.write(newV)(clock)();
@@ -12507,23 +13218,31 @@ var PS = {};
                                                           var audioClockCur = $foreign.getAudioClockTime(ctx)();
                                                           var instructions = {
                                                               t: clockNow_,
-                                                              i: Data_Array.fromFoldable(Data_List_Types.foldableList)(instr.instructionSet)
+                                                              i: instr.instructionSet
                                                           };
-                                                          Effect_Aff.launchAff_(Control_Bind.bind(Effect_Aff.bindAff)(Effect_Aff.joinFiber(fiber))(function (env) {
-                                                              return exporter.use(env)({
-                                                                  id: curIt,
-                                                                  timeStamp: timeInSeconds,
-                                                                  audio: Control_Bind.bind(Data_Maybe.bindMaybe)(v.value0)(Data_Function["const"](new Data_Maybe.Just(instructions.i))),
-                                                                  canvas: v.value1
+                                                          var exporterQueueRef = Effect_Ref.read(__exporterQueueRef)();
+                                                          Control_Bind.bind(Effect.bindEffect)(Effect_Aff.launchAff(Control_Bind.bind(Effect_Aff.bindAff)(Effect_Aff.joinFiber(fiber))(function (env) {
+                                                              return Control_Bind.bind(Effect_Aff.bindAff)(Effect_Aff.joinFiber(exporterQueueRef))(function () {
+                                                                  return exporter.use(env)({
+                                                                      id: curIt,
+                                                                      timeStamp: timeInSeconds,
+                                                                      audio: Control_Bind.bind(Data_Maybe.bindMaybe)(v.value0)(Data_Function["const"](new Data_Maybe.Just(instructions.i))),
+                                                                      canvas: v.value1
+                                                                  });
                                                               });
-                                                          }))();
+                                                          })))(Data_Function.flip(Effect_Ref.write)(__exporterQueueRef))();
                                                           var uts = Effect_Ref.read(units)();
-                                                          var uts$prime = $foreign.touchAudio(toFFI)(audioClockStart + (Data_Int.toNumber(instructions.t) + engineInfo.initialOffset) / 1000.0)(instructions.i)(ctx)(audioInfo)(uts)();
+                                                          var uts$prime = (function () {
+                                                              if (engineInfo.doWebAudio) {
+                                                                  return $foreign.touchAudio(toFFI)(audioClockStart + (Data_Int.toNumber(instructions.t) + engineInfo.initialOffset) / 1000.0)(instructions.i)(ctx)(audioInfo)(uts)();
+                                                              };
+                                                              return [  ];
+                                                          })();
                                                           Effect_Ref.write(uts$prime)(units)();
                                                           var __endTime = Data_Functor.map(Effect.functorEffect)(Data_JSDate.getTime)(Data_JSDate.now)();
                                                           (function () {
-                                                              var $4156 = __endTime - __startTime >= __contract;
-                                                              if ($4156) {
+                                                              var $5094 = __endTime - __startTime >= __contract;
+                                                              if ($5094) {
                                                                   return Effect_Class_Console.log(Effect_Class.monadEffectEffect)("Audio control processing is too slow. It took this long: " + (Data_Show.show(Data_Show.showNumber)(__endTime - __startTime) + (" but it needs to take this long: " + Data_Show.show(Data_Show.showNumber)(__contract))))();
                                                               };
                                                               return Data_Unit.unit;
@@ -12618,7 +13337,8 @@ var PS = {};
               msBetweenPings: 15,
               fastforwardLowerBound: 2.5e-2,
               rewindUpperBound: 0.15,
-              initialOffset: 0.1
+              initialOffset: 0.1,
+              doWebAudio: true
           })({
               periodicWaves: Foreign_Object.empty,
               floatArrays: Foreign_Object.empty,

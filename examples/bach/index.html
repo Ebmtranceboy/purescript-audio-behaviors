@@ -12,11 +12,11 @@
     function turnOnAudio() {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
-        offCb = PS["FRP.Behavior.Audio.Example.AudioParameters"].main(audioCtx)();
+        offCb = PS["FRP.Behavior.Audio.Example.Bach"].main(audioCtx)();
       });
     }
     function turnOffAudio() {
-      offCb ? offCb() : null;
+      offCb ? offCb : null;
       offCB = null;
       audioCtx ? audioCtx.close() : null;
       audioCtx = null;
