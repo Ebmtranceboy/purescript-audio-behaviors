@@ -3,22 +3,21 @@ module FRP.Behavior.Audio.Example.MIDI where
 import Prelude
 import Control.Promise (toAffE)
 import Data.Array (fold, head)
+import Data.NonEmpty ((:|))
 import Data.Int (toNumber)
 import Data.List (List(..), fromFoldable, sort, (:))
 import Data.List as DL
 import Data.Map as M
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.NonEmpty ((:|))
 import Data.Set (isEmpty)
 import Data.Set as DS
 import Data.Tuple (snd)
 import Data.Typelevel.Num (D1)
-import Debug.Trace (spy)
 import Effect (Effect)
 import Effect.Aff (joinFiber, launchAff, launchAff_)
 import Effect.Class (liftEffect)
-import FRP.Behavior (Behavior)
-import FRP.Behavior.Audio (AudioContext, AudioUnit, AudioInfo, EngineInfo, Exporter, IAudioUnit(..), RunInBrowserIAudioUnit, VisualInfo, gain, gain_', runInBrowser, sawtoothOsc_, speaker', defaultExporter)   
+import FRP.Behavior (Behavior) 
+import FRP.Behavior.Audio (AudioContext, AudioInfo, AudioUnit, EngineInfo, Exporter, IAudioUnit(..), RunInBrowserIAudioUnit, VisualInfo, defaultExporter, gain, gain_', runInBrowser, sawtoothOsc_, speaker')
 import FRP.Behavior.MIDI (midi)
 import FRP.Behavior.Mouse (buttons)
 import FRP.Event.MIDI (MIDI, MIDIEvent(..), MIDIEventInTime, getMidi, midiAccess)
@@ -69,14 +68,14 @@ synth time timeCorrection m =
   go acc (_ : rest) = go acc rest
 
 midi2cps :: Int -> Number
-midi2cps i = 440.0 * (2.0 `pow` (toNumber (spy "midi" i - 69) / 12.0))
+midi2cps i = 440.0 * (2.0 `pow` (toNumber (i - 69) / 12.0))
 
-type MIDIAccumulator r
-  = { syncWithAudioClock :: Maybe Number | r }
-  
-initialClock = { syncWithAudioClock: Just 0.0 } ::  { syncWithAudioClock :: Maybe Number }
+type MIDIAccumulator
+  = { syncWithAudioClock :: Maybe Number }
 
-scene :: forall r. Mouse -> MIDI -> MIDIAccumulator r -> Number -> Behavior (IAudioUnit D1 (MIDIAccumulator r))
+initialClock = { syncWithAudioClock: Nothing } :: MIDIAccumulator
+
+scene ::  Mouse -> MIDI -> MIDIAccumulator -> Number -> Behavior (IAudioUnit D1 (MIDIAccumulator))
 scene mouse midiIn acc time = f <$> click <*> (midi midiIn)
   where
   rad = pi * time
@@ -86,7 +85,7 @@ scene mouse midiIn acc time = f <$> click <*> (midi midiIn)
       ( speaker'
           ( gain 0.1
               ( zero
-                  :| ( map (\i -> gain_' ("gain" <> show i) 0.4 (gen ("sinOsc" <> show i) ((midi2cps i) + (if (not cl) then 0.0 else 10.0 * sin (7.0 * rad))))) (fromFoldable $ synth time newCorrection md)
+                  :| ( map (\i -> gain_' ("gain" <> show i) 0.4 (gen ("sinOsc" <> show i) ((midi2cps i) + (if (not cl) then 0.0 else 4.0 * sin (15.0 * rad))))) (fromFoldable $ synth time newCorrection md)
                     )
               )
           )
@@ -104,16 +103,16 @@ scene mouse midiIn acc time = f <$> click <*> (midi midiIn)
   click = map (not <<< isEmpty) $ buttons mouse
 
 runWithMidi ::
-  forall microphone track buffer floatArray periodicWave r env.
-  (Mouse -> MIDI -> MIDIAccumulator r -> Number -> Behavior (IAudioUnit D1 (MIDIAccumulator r))) ->
-  (MIDIAccumulator r) ->
+  forall microphone track buffer floatArray periodicWave.
+  (Mouse -> MIDI -> MIDIAccumulator  -> Number -> Behavior (IAudioUnit D1 (MIDIAccumulator ))) ->
+  (MIDIAccumulator ) ->
   AudioContext ->
   EngineInfo ->
   AudioInfo (O.Object microphone) (O.Object track) (O.Object buffer) (O.Object floatArray) (O.Object periodicWave) ->
   VisualInfo ->
-  Exporter env ->
+  Exporter Unit ->
   Effect (Effect Unit)
-runWithMidi callback ac ctx ei ai vi ex = do
+runWithMidi callback ac p0 p1 p2 p3 p4 = do
   fiber <-
     launchAff do
       macc <- toAffE midiAccess
@@ -121,15 +120,15 @@ runWithMidi callback ac ctx ei ai vi ex = do
       mouse <- liftEffect $ getMouse
       liftEffect
         $ ( runInBrowser ::
-               RunInBrowserIAudioUnit (MIDIAccumulator r) D1 env
+              RunInBrowserIAudioUnit (MIDIAccumulator) D1 Unit
           )
             (callback mouse md)
             ac
-            ctx
-            ei
-            ai
-            vi
-            ex
+            p0
+            p1
+            p2
+            p3
+            p4
   ( do
       let
         rest = joinFiber fiber
@@ -161,6 +160,4 @@ main ctx = do
     { canvases: O.empty
     }
     defaultExporter
-
- 
 
