@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Purescript Audio Behaviors</title>
+  </head>
+
+  <script src="index.js"></script>
+  <script>
+    var offCb = null;
+    var audioCtx = null;
+    function turnOnAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx.audioWorklet.addModule("ps-aud-mul.js").then(function () {
+        offCb = PS["FRP.Behavior.Audio.Example.MIDI"].main(audioCtx)();
+      });
+    }
+    function turnOffAudio() {
+      offCb ? offCb() : null;
+      offCB = null;
+      audioCtx ? audioCtx.close() : null;
+      audioCtx = null;
+    }
+  </script>
+  <body>
+    <button onclick="turnOnAudio();">turn on</button>
+    <button onclick="turnOffAudio();">turn off</button>
+  </body>
+</html>
