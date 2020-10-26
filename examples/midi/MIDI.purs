@@ -148,7 +148,7 @@ main ctx = do
     , msBetweenPings: 15
     , fastforwardLowerBound: 0.025
     , rewindUpperBound: 0.15
-    , initialOffset: 0.1
+    , initialOffset: 0.001
     , doWebAudio: true
     }
     { periodicWaves: O.empty

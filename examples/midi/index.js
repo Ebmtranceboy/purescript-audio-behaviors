@@ -14544,7 +14544,7 @@ var PS = {};
           msBetweenPings: 15,
           fastforwardLowerBound: 2.5e-2,
           rewindUpperBound: 0.15,
-          initialOffset: 0.1,
+          initialOffset: 1.0e-3,
           doWebAudio: true
       })({
           periodicWaves: Foreign_Object.empty,
