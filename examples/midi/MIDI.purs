@@ -13,6 +13,7 @@ import Data.Set (isEmpty)
 import Data.Set as DS
 import Data.Tuple (snd)
 import Data.Typelevel.Num (D1)
+import Debug.Trace (spy)
 import Effect (Effect)
 import Effect.Aff (joinFiber, launchAff, launchAff_)
 import Effect.Class (liftEffect)
@@ -68,7 +69,7 @@ synth time timeCorrection m =
   go acc (_ : rest) = go acc rest
 
 midi2cps :: Int -> Number
-midi2cps i = 440.0 * (2.0 `pow` (toNumber (i - 69) / 12.0))
+midi2cps i = 440.0 * (2.0 `pow` (toNumber (spy "midi" i - 69) / 12.0))
 
 type MIDIAccumulator r
   = { syncWithAudioClock :: Maybe Number | r }
